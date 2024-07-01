@@ -20,13 +20,16 @@ The config file is space insensitive but requires a key = value syntax
 
 ### Example
 ```
-bg_color = FF0000
-fg_color = 00FFFF
+bg_color = FF0000 # Sets the background color of the bar
+fg_color = 00FFFF # Sets the foreground color of rendered text
 
-bar_width  = 1900
-bar_height = 40
+bar_width  = 1900 # Sets the width of the bar
+bar_height = 40 # Sets the height of the bar
 
-bar_x = 10
+bar_x = 10 # Sets the bars x position
+bar_y = 10 # Sets the bars y position
+
+target_monitor = HDMI-0 # uses xrandr to find the specified monitor and adds the correct x and y offset to the bar_x and bar_y
 ```
 
 | Config Key | Values | Description |
@@ -35,7 +38,9 @@ bar_x = 10
 | fg_color | RGB HEX | The same values as above but for the text color |
 | bar_width | unsigned number | The width is a whole number that cannot be negative |
 | bar_height | unsigned number | Same values as bar_width |
-| bar_x | unsigned number | Same value as above, Controlls where the bar is placed (WILL CHANGE AT  SOME POINT TO USE XRANDR)
+| bar_x | unsigned number | Adds the value in pixels to the bar x pos |
+| bar_y | unsigned number | Adds the value in pixels to the bar y pos |
+| target_monitor | monitor name (HDMI-0) | Uses xrandr to find specified monitor and applies the correct x and y position to the bar to get it to the monitor
 
 ## Features
 
