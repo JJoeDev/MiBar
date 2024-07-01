@@ -9,4 +9,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 file(GLOB_RECURSE SRC src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SRC})
-target_link_libraries(${PROJECT_NAME} xcb xcb-util xcb-icccm)
+target_link_libraries(${PROJECT_NAME} xcb xcb-util xcb-icccm xcb-randr)

@@ -1,7 +1,10 @@
 #include <cstring>
+#include <functional>
 #include <iostream>
+
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
+#include <xcb/randr.h>
 
 #include "bar.h"
 #include "configManager.h"
@@ -15,27 +18,29 @@ Bar::Bar(){
 
     const xcb_setup_t* setup = xcb_get_setup(m_conn);
     xcb_screen_iterator_t iter = xcb_setup_roots_iterator(setup);
-    xcb_screen_t* screen = iter.data;
+    m_screen = iter.data;
 
-    m_colMap = screen->default_colormap;
+    GetDisplays();
+
+    m_colMap = m_screen->default_colormap;
 
     m_window = xcb_generate_id(m_conn);
 
     m_valueMask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-    m_valueList[0] = screen->black_pixel;
+    m_valueList[0] = m_screen->black_pixel;
     m_valueList[1] = XCB_EVENT_MASK_EXPOSURE;
 
     xcb_create_window(m_conn,
                       XCB_COPY_FROM_PARENT,
                       m_window,
-                      screen->root,
+                      m_screen->root,
                       m_barX,
                       m_barY,
                       m_barW,
                       m_barH,
                       0,
                       XCB_WINDOW_CLASS_INPUT_OUTPUT,
-                      screen->root_visual,
+                      m_screen->root_visual,
                       m_valueMask,
                       m_valueList);
 
@@ -66,7 +71,85 @@ Bar::Bar(){
 }
 
 Bar::~Bar(){
+    for(auto& i : m_crtcs){
+        delete i;
+    }
+
     xcb_disconnect(m_conn);
+}
+
+void Bar::GetDisplays(){
+    xcb_randr_get_screen_resources_current_cookie_t resCookie;
+    xcb_randr_get_screen_resources_current_reply_t* resReply;
+    xcb_randr_output_t* outputs;
+
+    resCookie = xcb_randr_get_screen_resources_current(m_conn, m_screen->root);
+    resReply = xcb_randr_get_screen_resources_current_reply(m_conn, resCookie, nullptr);
+
+    if(!resReply){
+        std::cerr << "Error getting screen resources\n";
+        return;
+    }
+
+    int numOutputs = xcb_randr_get_screen_resources_current_outputs_length(resReply);
+    outputs = xcb_randr_get_screen_resources_current_outputs(resReply);
+
+    static int appendIndex = 0;
+
+    for(int i = 0; i < numOutputs; ++i){
+        xcb_randr_output_t outI = outputs[i];
+
+        xcb_randr_get_output_info_cookie_t infoCookie;
+        xcb_randr_get_output_info_reply_t* infoReply;
+
+        infoCookie = xcb_randr_get_output_info(m_conn, outI, XCB_CURRENT_TIME);
+        infoReply = xcb_randr_get_output_info_reply(m_conn, infoCookie, nullptr);
+
+        if(!infoReply){
+            std::cerr << "Error getting output info!\n";
+            return;
+        }
+
+        std::string name(reinterpret_cast<char*>(xcb_randr_get_output_info_name(infoReply)), xcb_randr_get_output_info_name_length(infoReply));
+
+        std::cout << "[XCB RANDR]\t\tOutput: " << name << '\n';
+
+        if(infoReply->crtc != XCB_NONE){
+            xcb_randr_get_crtc_info_cookie_t crtcCoockie;
+            xcb_randr_get_crtc_info_reply_t* crtcReply;
+
+            crtcCoockie = xcb_randr_get_crtc_info(m_conn, infoReply->crtc, XCB_CURRENT_TIME);
+            crtcReply = xcb_randr_get_crtc_info_reply(m_conn, crtcCoockie, nullptr);
+
+            if(!crtcReply){
+                std::cout << "Error getting CRTC information\n";
+                free(infoReply);
+                continue;
+            }
+
+            printf("[INFO XCB RANDR]\tPOSITION (%i, %i)\n", crtcReply->x, crtcReply->y);
+            printf("[INFO XCB RANDR]\tSIZE (%i, %i)\n\n", crtcReply->width, crtcReply->height);
+
+            if(appendIndex < m_numDisplays){
+                m_crtcs[appendIndex] = crtcReply;
+                m_monitorNames[appendIndex] = name;
+                appendIndex++;
+            }
+            else{
+                free(crtcReply);
+            }
+
+        }
+        else{
+            std::cout << "[INFO XCB RANDR]\tOutput is not in use!\n\n";
+        }
+
+        free(infoReply);
+    }
+
+    free(resReply);
+
+    std::cout << "-" << std::endl;
 }
 
 void Bar::Run(){
@@ -92,7 +175,11 @@ void Bar::Run(){
 bool Bar::ChangeWindowBG(const uint32_t& col){
     xcb_alloc_color_reply_t* colReply;
 
-    xcb_alloc_color_cookie_t colCookie = xcb_alloc_color(m_conn, m_colMap, (col >> 16) & 0xFFFF, (col >> 8) & 0xFFFF, col & 0xFFFF);
+    const uint16_t r = ((col >> 16) & 0xFF) * 257;
+    const uint16_t g = ((col >> 8)  & 0xFF) * 257;
+    const uint16_t b = ( col        & 0xFF) * 257;
+
+    xcb_alloc_color_cookie_t colCookie = xcb_alloc_color(m_conn, m_colMap, r, g, b);
     colReply = xcb_alloc_color_reply(m_conn, colCookie, NULL);
 
     m_valueList[0] = colReply->pixel;
@@ -116,31 +203,38 @@ bool Bar::ChangeWindowSizePos(){
     return true;
 }
 
-uint32_t Bar::HexStrToUint32(const std::string& str){
-    std::cout << "STRING: " << str << '\n';
+const uint32_t Bar::HexStrToUint32(const std::string& str) const {
     return static_cast<uint32_t>(std::stoul(str, nullptr, 16));
+}
+
+void Bar::GetMonitorFromStrAndSetX(const std::string& name){
+    for(int i = 0; i < m_numDisplays; ++i){
+        if(name == m_monitorNames[i]){
+            m_barX += m_crtcs[i]->x;
+            m_barY += m_crtcs[i]->y;
+        }
+    }
 }
 
 void Bar::LoadConfig(){
     if(m_cfgMgr.Parse()){
-        auto cfgMap = m_cfgMgr.GetConfigFile();
+        const auto& cfgMap = m_cfgMgr.GetConfigFile();
 
-        if(cfgMap.find("bg_color") != cfgMap.end()){
-            m_BG_COL = HexStrToUint32(cfgMap["bg_color"]);
-            //m_gcVal[1] = m_BG_COL;
-            //changeWindowBG(m_BG_COL);
-        }
-        if(cfgMap.find("fg_color") != cfgMap.end()){
-            m_FG_COL = HexStrToUint32(cfgMap["fg_color"]);
-        }
-        if(cfgMap.find("bar_width") != cfgMap.end()){
-            m_barW = std::stoi(cfgMap["bar_width"]);
-        }
-        if(cfgMap.find("bar_height") != cfgMap.end()){
-            m_barH = std::stoi(cfgMap["bar_height"]);
-        }
-        if(cfgMap.find("bar_x") != cfgMap.end()){
-            m_barX = std::stoi(cfgMap["bar_x"]);
+        std::unordered_map<std::string, std::function<void(const std::string&)>> cfgHandlers = {
+            {"bg_color", [this](const std::string& value){m_BG_COL = HexStrToUint32(value); ChangeWindowBG(m_BG_COL);}},
+            {"fg_color", [this](const std::string& value){m_FG_COL = HexStrToUint32(value);}},
+            {"bar_width", [this](const std::string& value){m_barW = std::stoi(value);}},
+            {"bar_height", [this](const std::string& value){m_barH = std::stoi(value);}},
+            {"target_monitor", [this](const std::string& value){GetMonitorFromStrAndSetX(value);}},
+            {"bar_x", [this](const std::string& value){m_barX += std::stoi(value);}},
+            {"bar_y", [this](const std::string& value){m_barY += std::stoi(value);}},
+        };
+
+        for(const auto& [key, handler] : cfgHandlers){
+            auto iter = cfgMap.find(key);
+            if(iter != cfgMap.end()){
+                handler(iter->second);
+            }
         }
     }
 

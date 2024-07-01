@@ -3,8 +3,10 @@
 
 #include <cstdint>
 #include <memory>
+
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
+#include <xcb/randr.h>
 
 #include "configManager.h"
 
@@ -16,8 +18,11 @@ public:
     void Run();
 
 private:
+    void GetDisplays();
+
     void LoadConfig();
-    uint32_t HexStrToUint32(const std::string& str);
+    void GetMonitorFromStrAndSetX(const std::string& name);
+    const uint32_t HexStrToUint32(const std::string& str) const;
 
     bool ChangeWindowBG(const uint32_t& col);
     bool ChangeWindowSizePos();
@@ -25,8 +30,13 @@ private:
     xcb_atom_t GetAtom(const char* atomName);
     
     xcb_connection_t* m_conn = nullptr;
+    xcb_screen_t* m_screen = nullptr;
     xcb_window_t m_window = {};
-    
+
+    const unsigned char m_numDisplays = 4;
+    std::string m_monitorNames[4];
+    xcb_randr_get_crtc_info_reply_t* m_crtcs[4];
+
     unsigned int m_barX = 0;
     unsigned int m_barY = 0;
     unsigned int m_barW = 100;

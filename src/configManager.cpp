@@ -40,10 +40,6 @@ bool cfgManager::Parse(){
         }
     }
 
-    for(auto& i : m_configs){
-        std::cout << "KEY: " << i.first << " | VALUE: " << i.second << '\n';
-    }
-
     return true;
 }
 
