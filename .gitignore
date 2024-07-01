@@ -1,0 +1,5 @@
+bin/
+CMakeFiles/
+Makefile
+*.cmake
+CMakeCache.*
