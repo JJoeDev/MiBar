@@ -20,7 +20,7 @@ The config file syntax consists of Type:Key = Value and the following example wi
 
 ### Example
 ```
-target_monitor = HDMI-0 # uses xrandr to find the specified monitor and adds the correct x and y offset to the bar_x and bar_y
+bar:target_monitor = HDMI-0 # uses xrandr to find the specified monitor and adds the correct x and y offset to the bar_x and bar_y
 
 bar:bg_color = FFFF0000 # Sets the bar color to red following the AA-RR-GG-BB syntax
 bar:fg_color = FF0000FF # Sets the foreground / text to blue using AA-RR-GG-BB
