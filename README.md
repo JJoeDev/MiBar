@@ -16,35 +16,40 @@ First time running MiBar the application will look for the config directory at `
 
 Inside this directory you can create a ```config.mi``` file. This is where all the bar configuration will take place.
 
-The config file is space insensitive but requires a key = value syntax
+The config file syntax consists of Type:Key = Value and the following example will create a red bar with blue foreground (text) with a custom string to render
 
 ### Example
 ```
-bg_color = FF0000 # Sets the background color of the bar
-fg_color = 00FFFF # Sets the foreground color of rendered text
-
-bar_width  = 1900 # Sets the width of the bar
-bar_height = 40 # Sets the height of the bar
-
-bar_x = 10 # Sets the bars x position
-bar_y = 10 # Sets the bars y position
-
 target_monitor = HDMI-0 # uses xrandr to find the specified monitor and adds the correct x and y offset to the bar_x and bar_y
+
+bar:bg_color = FFFF0000 # Sets the bar color to red following the AA-RR-GG-BB syntax
+bar:fg_color = FF0000FF # Sets the foreground / text to blue using AA-RR-GG-BB
+
+bar:width  = 1900 # Sets the width of the bar
+bar:height = 40 # Sets the height of the bar
+
+bar:x = 10 # Sets the bars x position
+bar:y = 10 # Sets the bars y position
+
+text:create = Hello, Linux From MiBar
 ```
 
-| Config Key | Values | Description |
+| Type | Config Key | Values | Description |
 | - | - | - |
-| bg_color | RGB HEX | The value is hexadecimal RR-GG-BB so FF0000 would be red |
-| fg_color | RGB HEX | The same values as above but for the text color |
-| bar_width | unsigned number | The width is a whole number that cannot be negative |
-| bar_height | unsigned number | Same values as bar_width |
-| bar_x | unsigned number | Adds the value in pixels to the bar x pos |
-| bar_y | unsigned number | Adds the value in pixels to the bar y pos |
-| target_monitor | monitor name (HDMI-0) | Uses xrandr to find specified monitor and applies the correct x and y position to the bar to get it to the monitor
+| bar | bg_color | RGB HEX | The value is hexadecimal RR-GG-BB so FF0000 would be red |
+| bar | fg_color | RGB HEX | The same values as above but for the text color |
+| bar | bar_width | unsigned number | The width is a whole number that cannot be negative |
+| bar | bar_height | unsigned number | Same values as bar_width |
+| bar | bar_x | unsigned number | Adds the value in pixels to the bar x pos |
+| bar | bar_y | unsigned number | Adds the value in pixels to the bar y pos |
+| bar | target_monitor | monitor name (HDMI-0) | Uses xrandr to find specified monitor and applies the correct x and y position to the bar to get it to the monitor
+| text | create | string | Renders the desired string on the bar |
 
 ## Features
 
 | Feature | Status | Message |
 | - | - | - |
-| Rendering | Working | Can render the bar and precompiled content |
-| Configuration | Working | Can read config file and apply configs |
+| Rendering | Working | custom color and position |
+| Configuration | Working | config file from .config/MiBar/config.mi |
+| Transform | Working | user defined width height x and y |
+| Modules | W.I.P | demo text module for custom text rendering |
