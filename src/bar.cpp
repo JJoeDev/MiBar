@@ -8,6 +8,7 @@
 
 #include "bar.h"
 #include "configManager.h"
+#include "textModule.h"
 
 Bar::Bar(){    
     m_conn = xcb_connect(nullptr, nullptr);
@@ -57,6 +58,9 @@ Bar::Bar(){
     xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStrutPartialAtom, XCB_ATOM_CARDINAL, 32, 12, strut);
     xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, sizeof(char*), std::strlen(m_BAR_TITLE), m_BAR_TITLE);
 
+    // TEMP LOAD MODULES
+    //m_modules.push_back(new textModule("Hello Text Module"));
+
     LoadConfig();
 
     m_gcVal[0] = m_FG_COL;
@@ -75,7 +79,21 @@ Bar::~Bar(){
         delete i;
     }
 
+    for(auto& module : m_modules){
+        delete module;
+    }
+
     xcb_disconnect(m_conn);
+}
+
+void Bar::ModuleRender(){
+    int x = 10;
+    int y = m_barH / 2;
+
+    for(auto& module : m_modules){
+        module->Render(m_conn, m_window, m_gc, x, y);
+        x += module->GetWidth();
+    }
 }
 
 void Bar::GetDisplays(){
@@ -159,7 +177,7 @@ void Bar::Run(){
 
         switch(e->response_type & ~0x80){
         case XCB_EXPOSE:
-            xcb_image_text_8(m_conn, std::strlen(m_gcDemoText), m_window, m_gc, 10, 20, m_gcDemoText);
+            ModuleRender();
             xcb_flush(m_conn);
             break;
         default:
@@ -207,7 +225,7 @@ const uint32_t Bar::HexStrToUint32(const std::string& str) const {
     return static_cast<uint32_t>(std::stoul(str, nullptr, 16));
 }
 
-void Bar::GetMonitorFromStrAndSetX(const std::string& name){
+void Bar::GetMonitorFromStrAndSetPos(const std::string& name){
     for(int i = 0; i < m_numDisplays; ++i){
         if(name == m_monitorNames[i]){
             m_barX += m_crtcs[i]->x;
@@ -218,22 +236,41 @@ void Bar::GetMonitorFromStrAndSetX(const std::string& name){
 
 void Bar::LoadConfig(){
     if(m_cfgMgr.Parse()){
-        const auto& cfgMap = m_cfgMgr.GetConfigFile();
+        //const auto& cfgMap = m_cfgMgr.GetConfigFile();
+        const std::unordered_map<std::string, std::unordered_map<std::string, std::string>>& cfgMap = m_cfgMgr.GetConfigFile();
 
         std::unordered_map<std::string, std::function<void(const std::string&)>> cfgHandlers = {
             {"bg_color", [this](const std::string& value){m_BG_COL = HexStrToUint32(value); ChangeWindowBG(m_BG_COL);}},
             {"fg_color", [this](const std::string& value){m_FG_COL = HexStrToUint32(value);}},
-            {"bar_width", [this](const std::string& value){m_barW = std::stoi(value);}},
-            {"bar_height", [this](const std::string& value){m_barH = std::stoi(value);}},
-            {"target_monitor", [this](const std::string& value){GetMonitorFromStrAndSetX(value);}},
-            {"bar_x", [this](const std::string& value){m_barX += std::stoi(value);}},
-            {"bar_y", [this](const std::string& value){m_barY += std::stoi(value);}},
+            {"width", [this](const std::string& value){m_barW = std::stoi(value);}},
+            {"height", [this](const std::string& value){m_barH = std::stoi(value);}},
+            {"target_monitor", [this](const std::string& value){GetMonitorFromStrAndSetPos(value);}},
+            {"x", [this](const std::string& value){m_barX += std::stoi(value);}},
+            {"y", [this](const std::string& value){m_barY += std::stoi(value);}},
+            {"create", [this](const std::string& value){m_modules.push_back(new textModule(value));}}
         };
 
-        for(const auto& [key, handler] : cfgHandlers){
-            auto iter = cfgMap.find(key);
-            if(iter != cfgMap.end()){
-                handler(iter->second);
+        auto barCfgIter = cfgMap.find("bar");
+        if(barCfgIter != cfgMap.end()){
+            const auto& barCfg = barCfgIter->second;
+
+            for(const auto& [key, handler] : cfgHandlers){
+                auto iter = barCfg.find(key);
+                if(iter != barCfg.end()){
+                    handler(iter->second);
+                }
+            }
+        }
+
+        auto textCfgIter = cfgMap.find("text");
+        if(textCfgIter != cfgMap.end()){
+            const auto& textCfg = textCfgIter->second;
+
+            for(const auto& [key, handler] : cfgHandlers){
+                auto iter = textCfg.find(key);
+                if(iter != textCfg.end()){
+                    handler(iter->second);
+                }
             }
         }
     }

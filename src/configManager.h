@@ -13,7 +13,7 @@ public:
 
     bool Parse();
 
-    const std::unordered_map<std::string, std::string>& GetConfigFile() const { return m_configs; }
+    const std::unordered_map<std::string, std::unordered_map<std::string, std::string>>& GetConfigFile() const{ return m_configs; }
 
 private:
     std::string Trim(const std::string& str);
@@ -21,7 +21,7 @@ private:
     std::string m_cfgPath;
     const std::string m_cfgFile = "/config.mi";
 
-    std::unordered_map<std::string, std::string> m_configs;
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_configs;
 };
 
 #endif

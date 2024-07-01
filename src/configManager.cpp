@@ -25,17 +25,27 @@ bool cfgManager::Parse(){
     std::ifstream in(m_cfgPath + m_cfgFile);
 
     std::string line;
-    int index = 0;
     while(std::getline(in, line)){
         std::istringstream iline(line);
-        std::string key;
-        if(std::getline(iline, key, '=')){
+        std::string fullKey;
+
+        if(std::getline(iline, fullKey, '=')){
             std::string value;
+
             if(std::getline(iline, value)){
-                key = Trim(key);
+                fullKey = Trim(fullKey);
                 value = Trim(value);
 
-                m_configs[key] = value;
+                size_t colonPos = fullKey.find(':');
+                if(colonPos != std::string::npos){
+                    std::string module = fullKey.substr(0, colonPos);
+                    std::string key = fullKey.substr(colonPos + 1);
+
+                    m_configs[module][key] = value;
+                }
+                else {
+                    m_configs["default"][fullKey] = value;
+                }
             }
         }
     }

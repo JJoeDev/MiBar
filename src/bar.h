@@ -3,12 +3,14 @@
 
 #include <cstdint>
 #include <memory>
+#include <vector>
 
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
 #include <xcb/randr.h>
 
 #include "configManager.h"
+#include "module.h"
 
 class Bar{
 public:
@@ -21,11 +23,13 @@ private:
     void GetDisplays();
 
     void LoadConfig();
-    void GetMonitorFromStrAndSetX(const std::string& name);
+    void GetMonitorFromStrAndSetPos(const std::string& name);
     const uint32_t HexStrToUint32(const std::string& str) const;
 
     bool ChangeWindowBG(const uint32_t& col);
     bool ChangeWindowSizePos();
+
+    void ModuleRender();
 
     xcb_atom_t GetAtom(const char* atomName);
     
@@ -56,6 +60,7 @@ private:
 
     const char* m_BAR_TITLE = "MiBar";
 
+    std::vector<baseModule*> m_modules;
     cfgManager m_cfgMgr;
 };
 
