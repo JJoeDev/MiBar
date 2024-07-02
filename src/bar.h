@@ -53,7 +53,6 @@ private:
 
     xcb_gcontext_t m_gc = {};
     uint32_t m_gcVal[2] = {};
-    const char* m_gcDemoText = "Hello, World!";
 
     uint32_t m_valueMask = 0;
     uint32_t m_valueList[2] = {};
