@@ -1,7 +1,7 @@
 #ifndef MIBAR_CONFIG_MANAGER
 #define MIBAR_CONFIG_MANAGER
 
-#include <unordered_map>
+#include <memory>
 #include <toml++/toml.hpp>
 
 class configManager{
@@ -10,7 +10,7 @@ public:
     ~configManager();
 
 private:
-
+    std::unique_ptr<toml::table> m_table = nullptr;
 };
 
 #endif

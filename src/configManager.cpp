@@ -1,6 +1,7 @@
 #include <iostream>
 #include <filesystem>
 
+#define TOML_EXCEPTIONS 0
 #include "configManager.h"
 
 namespace fs = std::filesystem;
@@ -17,15 +18,13 @@ configManager::configManager(const std::string& target){
 
     std::cout << file << '\n';
 
-    try{
-        toml::table tbl = toml::parse_file(file);
-
-        std::cout << "bar: " << tbl["bar"] << '\n';
-    }
-    catch(const toml::parse_error& err){
-        std::cerr << "\nTOML ERROR IN: " << err.source().path << "\nDESC: " << err.description() << "\n" << err.source().begin;
+    toml::parse_result result = toml::parse_file(file);
+    if(!result){
+        std::cerr << "[ERROR] Config parsing failed: " << result.error() << '\n';
+        return;
     }
 
+    m_table = std::make_unique<toml::table>(std::move(result).table());
 }
 
 configManager::~configManager(){
