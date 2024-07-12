@@ -1,55 +1,31 @@
 # MiBar
 
-MiBar is a simple Linux X11 status bar
+A lightweight and minimal linux X11 status bar
 
 ---
 
 > [!WARNING]
 >
-> This project is no where near being a viabal daily driver for a bar and a ton of work is still required to get it to work correctly.
+> MiBar is under heavy development and should not be used yet.
 
-## Configuration
+## Intro
+MiBar is a C++17 app designed to be a user-friendly and configurable status bar for the X11 window system on linux. The goal is to create a minimal and light weight status bar with easy customization and extendability so users can create their own bar components.
 
-**This has not been completed yet and is still a work in progress**
+## Current state
+MiBar is in its early stages of development. While core functionalities like configuration parsing are in place, the project is yet to use any of the parsed data. The renderer is also under development and only supports rendering a hard coded string at the moment.
 
-First time running MiBar the application will look for the config directory at ```$HOME/.config/MiBar```. If this directory does not exist it will be created for you.
+## Features (+ planned)
 
-Inside this directory you can create a ```config.mi``` file. This is where all the bar configuration will take place.
+*More features might be added in the future*
 
-The config file syntax consists of Type:Key = Value and the following example will create a red bar with blue foreground (text) with a custom string to render
+* (planned) **Modules:** MiBar would like for users to be able to create their own modules for the bar to allow for even more customizability
+* (W.I.P) **Configuration:** I am working on getting the bar ready to use the parsed config.toml file that is created at ```$HOME/.config/MiBar/config.toml```
 
-### Example
-```
-bar:target_monitor = HDMI-0 # uses xrandr to find the specified monitor and adds the correct x and y offset to the bar_x and bar_y
+## Dependencies
+[xcb](https://xcb.freedesktop.org/) is used to interact with the X11 server
 
-bar:bg_color = FFFF0000 # Sets the bar color to red following the AA-RR-GG-BB syntax
-bar:fg_color = FF0000FF # Sets the foreground / text to blue using AA-RR-GG-BB
+[toml++](https://marzer.github.io/tomlplusplus/) is used for configuration parsing
 
-bar:width  = 1900 # Sets the width of the bar
-bar:height = 40 # Sets the height of the bar
+## Getting involved
 
-bar:x = 10 # Sets the bars x position
-bar:y = 10 # Sets the bars y position
-
-text:create = Hello, Linux From MiBar
-```
-
-| Type | Config Key | Values | Description |
-| - | - | - |
-| bar | bg_color | RGB HEX | The value is hexadecimal RR-GG-BB so FF0000 would be red |
-| bar | fg_color | RGB HEX | The same values as above but for the text color |
-| bar | bar_width | unsigned number | The width is a whole number that cannot be negative |
-| bar | bar_height | unsigned number | Same values as bar_width |
-| bar | bar_x | unsigned number | Adds the value in pixels to the bar x pos |
-| bar | bar_y | unsigned number | Adds the value in pixels to the bar y pos |
-| bar | target_monitor | monitor name (HDMI-0) | Uses xrandr to find specified monitor and applies the correct x and y position to the bar to get it to the monitor
-| text | create | string | Renders the desired string on the bar |
-
-## Features
-
-| Feature | Status | Message |
-| - | - | - |
-| Rendering | Working | custom color and position |
-| Configuration | Working | config file from .config/MiBar/config.mi |
-| Transform | Working | user defined width height x and y |
-| Modules | W.I.P | demo text module for custom text rendering |
+Currently, the project is not actively seeking contributions. However, if you have any suggestions or find potential improvements, feel free to reach out. Well-explained pull requests with clear descriptions and code comments will be considered for future versions.

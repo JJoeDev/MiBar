@@ -1,66 +1,33 @@
-#include "configManager.h"
-
 #include <iostream>
 #include <filesystem>
-#include <fstream>
 
-namespace fs = ::std::filesystem;
+#include "configManager.h"
 
-cfgManager::cfgManager(){
-    m_cfgPath = fs::path(getenv("HOME")) / ".config/MiBar";
+namespace fs = std::filesystem;
 
-    if(fs::create_directory(m_cfgPath)){
-        std::cout << "Creating MiBar config directory at: " << m_cfgPath << '\n';
+configManager::configManager(const std::string& target){
+    std::string file = fs::path(getenv("HOME")) / ".config/MiBar/";
+    
+    if(target.empty()){
+        file.append("config.toml");
     }
     else{
-        std::cout << "Config directory is ready at: " << m_cfgPath << '\n';
-    }
-}
-
-cfgManager::~cfgManager(){
-
-}
-
-bool cfgManager::Parse(){
-    std::ifstream in(m_cfgPath + m_cfgFile);
-
-    std::string line;
-    while(std::getline(in, line)){
-        std::istringstream iline(line);
-        std::string fullKey;
-
-        if(std::getline(iline, fullKey, '=')){
-            std::string value;
-
-            if(std::getline(iline, value)){
-                fullKey = Trim(fullKey);
-                value = Trim(value);
-
-                size_t colonPos = fullKey.find(':');
-                if(colonPos != std::string::npos){
-                    std::string module = fullKey.substr(0, colonPos);
-                    std::string key = fullKey.substr(colonPos + 1);
-
-                    m_configs[module][key] = value;
-                }
-                else {
-                    m_configs["default"][fullKey] = value;
-                }
-            }
-        }
+        file.append(target + ".toml");
     }
 
-    return true;
-}
+    std::cout << file << '\n';
 
-// Privates
+    try{
+        toml::table tbl = toml::parse_file(file);
 
-std::string cfgManager::Trim(const std::string& str){
-    size_t first = str.find_first_not_of(' ');
-    if(std::string::npos == first){
-        return str;
+        std::cout << "bar: " << tbl["bar"] << '\n';
+    }
+    catch(const toml::parse_error& err){
+        std::cerr << "\nTOML ERROR IN: " << err.source().path << "\nDESC: " << err.description() << "\n" << err.source().begin;
     }
 
-    size_t last = str.find_last_not_of(' ');
-    return str.substr(first, last - first + 1);
+}
+
+configManager::~configManager(){
+
 }

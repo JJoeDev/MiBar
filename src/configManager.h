@@ -1,27 +1,16 @@
-#ifndef CONFIG_MANAGER_H
-#define CONFIG_MANAGER_H
+#ifndef MIBAR_CONFIG_MANAGER
+#define MIBAR_CONFIG_MANAGER
 
-// https://stackoverflow.com/questions/6892754/creating-a-simple-configuration-file-and-parser-in-c
-
-#include <string>
 #include <unordered_map>
+#include <toml++/toml.hpp>
 
-class cfgManager{
+class configManager{
 public:
-    cfgManager();
-    ~cfgManager();
-
-    bool Parse();
-
-    const std::unordered_map<std::string, std::unordered_map<std::string, std::string>>& GetConfigFile() const{ return m_configs; }
+    configManager(const std::string& target = "");
+    ~configManager();
 
 private:
-    std::string Trim(const std::string& str);
 
-    std::string m_cfgPath;
-    const std::string m_cfgFile = "/config.mi";
-
-    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_configs;
 };
 
 #endif
