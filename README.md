@@ -22,6 +22,7 @@ Custom components are also not implemented yet and neither is components like: t
 
 * (planned) **Modules:** MiBar would like for users to be able to create their own modules for the bar to allow for even more customizability
 * (planned) **Configuration:** At some point in the future MiBar should move away from the C header file to  a toml or json approach for configuration
+* (planned) **Fonts** Currently MiBar only supports X11 fonts (use xlsfonts to see all fonts) in the future we should switch to cairo
 
 ## Building and running
 The current version includes a config file in the form of a C header file located in ``miBar/src/general.config.h``. Each time this config file is modified a recompilation is required.
@@ -29,7 +30,7 @@ The current version includes a config file in the form of a C header file locate
 ### Building
 ```
 $ cd /Path/To/MiBar/CMakeLists.txt
-$ cmake .
+$ cmake . -DCMAKE_BUILD_TYPE=Release
 $ cmake --build .
 $ ./bin/MiBar
 ```

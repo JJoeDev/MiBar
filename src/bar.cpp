@@ -3,6 +3,8 @@
 #include "bar.h"
 #include "randr.h"
 
+#include "bar.config.h"
+
 mibar::mibar(){
     m_conn = xcb_connect(nullptr, nullptr);
     if(xcb_connection_has_error(m_conn)){
@@ -19,10 +21,10 @@ mibar::mibar(){
     Randr r(m_conn, m_screen);
     const auto mon = r.GetDisplayInfo("HDMI-0");
 
-    m_x = mon->x;
-    m_y = mon->y;
-    m_w = mon->width;
-    m_h = 40;
+    m_x = mon->x + BAR_X;
+    m_y = mon->y + BAR_Y;
+    m_w = mon->width + BAR_WIDTH;
+    m_h = BAR_HEIGHT;
 
     m_window = xcb_generate_id(m_conn);
     xcb_create_window(m_conn,
@@ -59,8 +61,7 @@ mibar::~mibar(){
 }
 
 void mibar::EventLoop(){
-    logger->Log(__FILE_NAME__, 0, "This version of MiBar has no config manager and will need to be recompiled after configuring");
-    logger->Log("", 0, "This version of MiBar is also not ready for day to day usage and may get huge changes on each update!");
+    logger->Log("", 0, "Hello World!", LogLvl::DBUG);
 
     Renderer r(m_screen, m_conn, m_window);
 
@@ -70,7 +71,8 @@ void mibar::EventLoop(){
         switch(e->response_type & 0x7F){
         case XCB_EXPOSE:
             r.Clear(0, 0, m_w, m_h);
-            r.DrawText("Welcome to a simple preview of MiBar!", m_x / 2 - (38 * 8 / 2));
+
+            if(TEXT_MODULE_ON) r.DrawText(TEXT_MODULE_STR, TEXT_MODULE_X, TEXT_MODULE_Y, TEXT_MODULE_CENTER_Y);
             
             xcb_flush(m_conn);
             break;

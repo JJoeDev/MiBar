@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 project(MiBar)
 
+# Change between Debug and Release -> cmake . -DCMAKE_BUILD_TYPE=Debug && make && ./bin/MiBar
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(CMAKE_CXX_STANDARD 17)

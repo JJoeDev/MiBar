@@ -33,7 +33,11 @@ void Logger::Log(const std::string& file, const int line, const std::string& msg
         break;
     }
 
+#ifndef NDEBUG 
     ConsoleLog(std::string{type + msg + " : " + file + (line > 0 ? " : " + std::to_string(line) : "")});
+#else
+    if(level != LogLvl::DBUG) ConsoleLog(std::string{type + msg + " : " + file + (line > 0 ? " : " + std::to_string(line) : "")});
+#endif
 }
 
 // PRIVATES

@@ -19,7 +19,9 @@
 #define COLOR2 0x237E76
 #define COLOR3 0x3CA99F
 
-#define AUTO_CENTER_Y 1
-#define CUSTOM_Y 35
+#define ENABLE_UNDERLINE 1
+#define UNDERLINE_HEIGHT 5
+#define UNDERLINE_X_OFFSET 0
+#define UNDERLINE_Y_OFFSET 0
 
 #endif
