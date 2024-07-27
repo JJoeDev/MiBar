@@ -17,7 +17,6 @@ public:
 
 private:
     std::unordered_map<std::string, xcb_randr_get_crtc_info_reply_t*> m_displays;
-    //std::vector<xcb_randr_get_crtc_info_reply_t*> m_displays;
 };
 
 #endif

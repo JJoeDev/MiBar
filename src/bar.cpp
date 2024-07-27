@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "renderer.h"
 #include "utils.h"
 #include "bar.h"
@@ -8,7 +6,7 @@
 mibar::mibar(){
     m_conn = xcb_connect(nullptr, nullptr);
     if(xcb_connection_has_error(m_conn)){
-        std::cerr << "Failed to connecto to X server!\n";
+        logger->Log(__FILE_NAME__, __LINE__, "Could not connect to X server!", LogLvl::ERROR);
         return;
     }
 
@@ -18,13 +16,21 @@ mibar::mibar(){
     m_winValues[0] = m_screen->black_pixel;
     m_winValues[1] = XCB_EVENT_MASK_EXPOSURE;
 
+    Randr r(m_conn, m_screen);
+    const auto mon = r.GetDisplayInfo("HDMI-0");
+
+    m_x = mon->x;
+    m_y = mon->y;
+    m_w = mon->width;
+    m_h = 40;
+
     m_window = xcb_generate_id(m_conn);
     xcb_create_window(m_conn,
                       m_screen->root_depth,
                       m_window,
                       m_screen->root,
-                      1920, 0,
-                      1920, 30,
+                      m_x, m_y,
+                      m_w, m_h,
                       0,
                       XCB_WINDOW_CLASS_INPUT_OUTPUT,
                       m_screen->root_visual,
@@ -42,13 +48,10 @@ mibar::mibar(){
     xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStrutPartialAtom, XCB_ATOM_CARDINAL, 32, 12, strut);
 
     // Set window title
-    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, sizeof(char*), 5, "MiBar");
+    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, sizeof(char*), 5, "MiBar"); // 5 = 5 chars
 
     xcb_map_window(m_conn, m_window);
     xcb_flush(m_conn);
-
-    Randr displays(m_conn, m_screen);
-    const auto& d = displays.GetDisplayInfo("HDMI-0");
 }
 
 mibar::~mibar(){
@@ -56,6 +59,9 @@ mibar::~mibar(){
 }
 
 void mibar::EventLoop(){
+    logger->Log(__FILE_NAME__, 0, "This version of MiBar has no config manager and will need to be recompiled after configuring");
+    logger->Log("", 0, "This version of MiBar is also not ready for day to day usage and may get huge changes on each update!");
+
     Renderer r(m_screen, m_conn, m_window);
 
     xcb_generic_event_t* e;
@@ -63,8 +69,9 @@ void mibar::EventLoop(){
     while((e = xcb_wait_for_event(m_conn))){
         switch(e->response_type & 0x7F){
         case XCB_EXPOSE:
-            std::cout << "Le Expose\n";
-            r.DrawText("Hello, World!");
+            r.Clear(0, 0, m_w, m_h);
+            r.DrawText("Welcome to a simple preview of MiBar!", m_x / 2 - (38 * 8 / 2));
+            
             xcb_flush(m_conn);
             break;
         }

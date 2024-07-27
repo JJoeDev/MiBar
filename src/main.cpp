@@ -5,7 +5,6 @@
 #include <functional>
 
 #include "bar.h"
-#include "configManager.h"
 
 void CliHelp(const std::string&){
     std::cout << "MiBar argument help\n\n" \
@@ -42,8 +41,6 @@ bool Cli(int argc, char** argv){
 
 int main(int argc, char** argv){
     if(!Cli(argc, argv)) return 1;
-
-    configManager cfg;
 
     mibar bar;
 

@@ -12,19 +12,34 @@ A lightweight and minimal linux X11 status bar
 MiBar is a C++17 app designed to be a user-friendly and configurable status bar for the X11 window system on linux. The goal is to create a minimal and light weight status bar with easy customization and extendability so users can create their own bar components.
 
 ## Current state
-MiBar is in its early stages of development. While core functionalities like configuration parsing are in place, the project is yet to use any of the parsed data. The renderer is also under development and only supports rendering a hard coded string at the moment.
+MiBar is in the early stages of development so components like configuration are not 100% in place and will have to take place in a C header file for now, this has the consequence of requireing the application to be recompiled every time the configuration file is modifed. 
+
+Custom components are also not implemented yet and neither is components like: time, volume, and so on.
 
 ## Features (+ planned)
 
 *More features might be added in the future*
 
 * (planned) **Modules:** MiBar would like for users to be able to create their own modules for the bar to allow for even more customizability
-* (W.I.P) **Configuration:** I am working on getting the bar ready to use the parsed config.toml file that is created at ```$HOME/.config/MiBar/config.toml```
+* (planned) **Configuration:** At some point in the future MiBar should move away from the C header file to  a toml or json approach for configuration
+
+## Building and running
+The current version includes a config file in the form of a C header file located in ``miBar/src/general.config.h``. Each time this config file is modified a recompilation is required.
+
+### Building
+```
+$ cd /Path/To/MiBar/CMakeLists.txt
+$ cmake .
+$ cmake --build .
+$ ./bin/MiBar
+```
 
 ## Dependencies
 [xcb](https://xcb.freedesktop.org/) is used to interact with the X11 server
 
-[toml++](https://marzer.github.io/tomlplusplus/) is used for configuration parsing
+## Images
+![DemoImage](./github_assets/DemoBar.png)
+Configuration for [this](./src/general.config.h) bar
 
 ## Getting involved
 
