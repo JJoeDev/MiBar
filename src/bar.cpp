@@ -19,7 +19,7 @@ mibar::mibar(){
     m_winValues[1] = XCB_EVENT_MASK_EXPOSURE;
 
     Randr r(m_conn, m_screen);
-    const auto mon = r.GetDisplayInfo("HDMI-0");
+    const auto mon = r.GetDisplayInfo(TARGET_MONITOR);
 
     m_x = mon->x + BAR_X;
     m_y = mon->y + BAR_Y;
