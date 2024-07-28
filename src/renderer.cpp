@@ -15,17 +15,20 @@ Renderer::Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w) 
     xcb_query_font_reply_t* fontInfo = xcb_query_font_reply(c, xcb_query_font(c, m_font), nullptr);
     m_charWidth = fontInfo->max_bounds.character_width;
 
+    logger->Log("", 0, "fixed font char width: " + std::to_string(m_charWidth), LogLvl::DBUG);
+
     xcb_create_gc(c, m_drawGC, w, XCB_GC_FOREGROUND | XCB_GC_BACKGROUND | XCB_GC_FONT, (uint32_t[]){drawPalette[1], drawPalette[0], m_font});
     xcb_create_gc(c, m_clearGC, w, XCB_GC_FOREGROUND, (uint32_t[]){drawPalette[0]});
     xcb_create_gc(c, m_underlineGC, w, XCB_GC_FOREGROUND, (uint32_t[]){drawPalette[2]});
 
     free(fontInfo);
-
+    
     xcb_close_font_checked(m_conn, m_font);
     xcb_flush(c);
 }
 
 Renderer::~Renderer(){
+    m_components.clear();
 }
 
 void Renderer::Clear(int16_t x, int16_t y, uint16_t w, uint16_t h){

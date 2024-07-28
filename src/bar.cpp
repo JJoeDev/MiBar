@@ -5,6 +5,8 @@
 
 #include "bar.config.h"
 
+#include "components/textComp.h"
+
 mibar::mibar(){
     m_conn = xcb_connect(nullptr, nullptr);
     if(xcb_connection_has_error(m_conn)){
@@ -61,9 +63,10 @@ mibar::~mibar(){
 }
 
 void mibar::EventLoop(){
-    logger->Log("", 0, "Hello World!", LogLvl::DBUG);
-
     Renderer r(m_screen, m_conn, m_window);
+
+    auto tc = std::make_unique<TextComponent>(TextComponent());
+    r.AddComponent(std::move(tc));
 
     xcb_generic_event_t* e;
 
