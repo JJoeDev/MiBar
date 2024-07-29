@@ -65,8 +65,7 @@ mibar::~mibar(){
 void mibar::EventLoop(){
     Renderer r(m_screen, m_conn, m_window);
 
-    auto tc = std::make_unique<TextComponent>(TextComponent());
-    r.AddComponent(std::move(tc));
+    r.AddComponent(std::make_unique<TextComponent>());
 
     xcb_generic_event_t* e;
 
