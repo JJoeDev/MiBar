@@ -3,7 +3,7 @@
 #include "renderer.h"
 
 Renderer::Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w) : m_conn(c), m_window(w){
-    logger = Logger::GetInstance();
+    
 
     m_drawGC = xcb_generate_id(c);
     m_clearGC = xcb_generate_id(c);
@@ -15,7 +15,7 @@ Renderer::Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w) 
     xcb_query_font_reply_t* fontInfo = xcb_query_font_reply(c, xcb_query_font(c, m_font), nullptr);
     m_charWidth = fontInfo->max_bounds.character_width;
 
-    logger->Log("", 0, "fixed font char width: " + std::to_string(m_charWidth), LogLvl::DBUG);
+    m_Logger.Log("", 0, "fixed font char width: " + std::to_string(m_charWidth), LogLvl::DBUG);
 
     xcb_create_gc(c, m_drawGC, w, XCB_GC_FOREGROUND | XCB_GC_BACKGROUND | XCB_GC_FONT, (uint32_t[]){drawPalette[1], drawPalette[0], m_font});
     xcb_create_gc(c, m_clearGC, w, XCB_GC_FOREGROUND, (uint32_t[]){drawPalette[0]});
@@ -43,7 +43,7 @@ void Renderer::DrawText(const std::string& str, const int16_t x, const int16_t y
             xcb_image_text_8(m_conn, str.length(), m_window, m_drawGC, x, geom->height / 2 + 4, str.c_str());
         }
         else{
-            logger->Log(__FILE_NAME__, __LINE__, "Unable to get window geometry!", LogLvl::ERROR);
+            m_Logger.Log(__FILE_NAME__, __LINE__, "Unable to get window geometry!", LogLvl::ERROR);
         }
 
     }

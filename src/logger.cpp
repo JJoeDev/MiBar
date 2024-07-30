@@ -1,14 +1,6 @@
 #include "logger.h"
 
-std::shared_ptr<Logger> Logger::m_logInstance;
-
-std::shared_ptr<Logger> Logger::GetInstance(){
-    if(!m_logInstance){
-        m_logInstance = std::shared_ptr<Logger>(new Logger());
-    }
-
-    return m_logInstance;
-}
+std::shared_ptr<Logger> g_Logger;
 
 void Logger::Log(const std::string& file, const int line, const std::string& msg, LogLvl level){
     std::string type;

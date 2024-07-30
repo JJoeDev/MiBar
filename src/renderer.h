@@ -41,7 +41,7 @@ public:
 private:
     xcb_connection_t* m_conn;
     xcb_window_t& m_window;
-    std::shared_ptr<Logger> logger;
+    Logger m_Logger;
 
     void DrawUnderline(const xcb_rectangle_t& rect);
 

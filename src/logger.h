@@ -15,8 +15,6 @@ enum class LogLvl{
 
 class Logger{
 public:
-    static std::shared_ptr<Logger> GetInstance();
-
     /**
         A function to print a detailed string to the console with std::cout
 
@@ -28,8 +26,6 @@ public:
     void Log(const std::string& file, const int line, const std::string& msg, LogLvl level = LogLvl::INFO);
 
 private:
-    static std::shared_ptr<Logger> m_logInstance;
-
     void ConsoleLog(const std::string& msg);
 };
 
