@@ -10,6 +10,9 @@ public:
     mibar();
     ~mibar();
 
+    /**
+        Run the XCB event loop. This loop waits for exposure events to know when to re-render the bar
+    */
     void EventLoop();
 
 private:

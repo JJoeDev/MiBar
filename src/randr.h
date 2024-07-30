@@ -11,9 +11,14 @@ public:
     Randr(xcb_connection_t* c, xcb_screen_t* s);
     ~Randr();
 
-    const xcb_randr_get_crtc_info_reply_t* GetDisplayInfo(const std::string& display) const;
+    /**
+        A function that returns crtc info for the display name 
 
-    void Init();
+        @param display This is the name of the display to get the information about
+
+        @return Returns a pointer to the crtc info reply containing info such as scale and position
+    */
+    const xcb_randr_get_crtc_info_reply_t* GetDisplayInfo(const std::string& display) const;
 
 private:
     std::unordered_map<std::string, xcb_randr_get_crtc_info_reply_t*> m_displays;
