@@ -3,14 +3,14 @@
 #include "bar.h"
 #include "randr.h"
 
-#include "bar.config.h"
-
 #include "components/textComp.h"
 
 mibar::mibar(){
+    m_logger.Log(__FILE_NAME__, __LINE__, "DEBUG BUILD", LogLvl::DBUG);
+
     m_conn = xcb_connect(nullptr, nullptr);
     if(xcb_connection_has_error(m_conn)){
-        logger->Log(__FILE_NAME__, __LINE__, "Could not connect to X server!", LogLvl::ERROR);
+        m_logger.Log(__FILE_NAME__, __LINE__, "Could not connect to X server!", LogLvl::ERROR);
         return;
     }
 
@@ -65,16 +65,17 @@ mibar::~mibar(){
 void mibar::EventLoop(){
     Renderer r(m_screen, m_conn, m_window);
 
-    r.AddComponent(std::make_unique<TextComponent>());
+    r.AddComponent(std::make_unique<TextComponent>(TEXT_MODULE_STR));
+
+    r.InitComponentsPositions();
 
     xcb_generic_event_t* e;
-
     while((e = xcb_wait_for_event(m_conn))){
         switch(e->response_type & 0x7F){
         case XCB_EXPOSE:
             r.Clear(0, 0, m_w, m_h);
 
-            if(TEXT_MODULE_ON) r.DrawText(TEXT_MODULE_STR, TEXT_MODULE_X, TEXT_MODULE_Y, TEXT_MODULE_CENTER_Y);
+            r.DrawComponents();
             
             xcb_flush(m_conn);
             break;

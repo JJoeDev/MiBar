@@ -1,3 +1,4 @@
+#include <cassert>
 #include <xcb/xcb.h>
 
 #include "renderer.h"
@@ -15,53 +16,66 @@ Renderer::Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w) 
     xcb_query_font_reply_t* fontInfo = xcb_query_font_reply(c, xcb_query_font(c, m_font), nullptr);
     m_charWidth = fontInfo->max_bounds.character_width;
 
-    m_Logger.Log("", 0, "fixed font char width: " + std::to_string(m_charWidth), LogLvl::DBUG);
+    m_logger.Log("", 0, "fixed font char width: " + std::to_string(m_charWidth), LogLvl::DBUG);
 
-    xcb_create_gc(c, m_drawGC, w, XCB_GC_FOREGROUND | XCB_GC_BACKGROUND | XCB_GC_FONT, (uint32_t[]){drawPalette[1], drawPalette[0], m_font});
-    xcb_create_gc(c, m_clearGC, w, XCB_GC_FOREGROUND, (uint32_t[]){drawPalette[0]});
-    xcb_create_gc(c, m_underlineGC, w, XCB_GC_FOREGROUND, (uint32_t[]){drawPalette[2]});
+    xcb_create_gc(c, m_drawGC, w, XCB_GC_FOREGROUND | XCB_GC_BACKGROUND | XCB_GC_FONT, (uint32_t[]){m_palette[1], m_palette[0], m_font});
+    xcb_create_gc(c, m_clearGC, w, XCB_GC_FOREGROUND, (uint32_t[]){m_palette[0]});
+    xcb_create_gc(c, m_underlineGC, w, XCB_GC_FOREGROUND, (uint32_t[]){m_palette[2]});
 
     free(fontInfo);
     
+    m_geometry = xcb_get_geometry_reply(c, xcb_get_geometry(c, w), nullptr);
+
     xcb_close_font_checked(m_conn, m_font);
     xcb_flush(c);
 }
 
 Renderer::~Renderer(){
     m_components.clear();
+
+    delete m_geometry;
+    m_geometry = nullptr;
+}
+
+void Renderer::InitComponentsPositions(){
+    for(auto&& component : m_components){
+        component->y = m_geometry->height / 2 + 4 + PADDING_TOP; // We use xcb_image_text_8 so the text has a height of 8 pixels
+        component->x += PADDING_LEFT;
+    }
+}
+
+void Renderer::DrawRect(int16_t x, int16_t y, uint16_t w, uint16_t h, xcb_gcontext_t& gc){
+    xcb_poly_fill_rectangle(m_conn, m_window, gc, 1, (const xcb_rectangle_t[]){{x, y, w, h}});
 }
 
 void Renderer::Clear(int16_t x, int16_t y, uint16_t w, uint16_t h){
-    xcb_poly_fill_rectangle(m_conn, m_window, m_clearGC, 1, (const xcb_rectangle_t[]){{x, y, w, h}});
+    DrawRect(x, y, w, h, m_clearGC);
 }
 
-void Renderer::DrawText(const std::string& str, const int16_t x, const int16_t y, const bool autoCenterY){
-    xcb_get_geometry_reply_t* geom = xcb_get_geometry_reply(m_conn, xcb_get_geometry(m_conn, m_window), nullptr);
+void Renderer::DrawComponents(){
+    for(auto&& component : m_components){
+        component->Draw(m_conn, m_window, m_drawGC);
 
-    if(autoCenterY){
-        if(geom){
-            xcb_image_text_8(m_conn, str.length(), m_window, m_drawGC, x, geom->height / 2 + 4, str.c_str());
-        }
-        else{
-            m_Logger.Log(__FILE_NAME__, __LINE__, "Unable to get window geometry!", LogLvl::ERROR);
-        }
+        if(!ENABLE_UNDERLINE) continue;
 
+        DrawRect(component->x, m_geometry->height - UNDERLINE_HEIGHT, component->GetWidth(m_charWidth), UNDERLINE_HEIGHT, m_underlineGC);
     }
-    else {
-        xcb_image_text_8(m_conn, str.length(), m_window, m_drawGC, x, y, str.c_str());
-    }
+}
 
-    if(ENABLE_UNDERLINE){
-        int16_t yPos = static_cast<int16_t>(geom->height - UNDERLINE_HEIGHT + UNDERLINE_Y_OFFSET);
-        int16_t xPos = static_cast<int16_t>(x + UNDERLINE_X_OFFSET);
+void Renderer::SetForeground(uint32_t idx){
+    assert(idx <= m_palette.size());
+    xcb_change_gc(m_conn, m_drawGC, XCB_GC_FOREGROUND, (const uint32_t[]){m_palette[idx]});
+}
 
-        uint16_t length = static_cast<uint16_t>(str.length() * m_charWidth);
+void Renderer::SetBackground(uint32_t idx){
+    assert(idx <= m_palette.size());
+    xcb_change_gc(m_conn, m_drawGC, XCB_GC_BACKGROUND, (const uint32_t[]){m_palette[idx]});
+    xcb_change_gc(m_conn, m_clearGC, XCB_GC_FOREGROUND, (const uint32_t[]){m_palette[idx]});
+}
 
-        const auto rect = xcb_rectangle_t{xPos, yPos, length, UNDERLINE_HEIGHT};
-        DrawUnderline(rect);
-    }
-    
-    free(geom);
+void Renderer::SetUnderline(uint32_t idx){
+    assert(idx <= m_palette.size());
+    xcb_change_gc(m_conn, m_underlineGC, XCB_GC_FOREGROUND, (const uint32_t[]){m_palette[idx]});
 }
 
 // PRIVATE

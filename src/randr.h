@@ -6,6 +6,8 @@
 
 #include <xcb/randr.h>
 
+#include "logger.h"
+
 class Randr{
 public:
     Randr(xcb_connection_t* c, xcb_screen_t* s);
@@ -21,6 +23,8 @@ public:
     const xcb_randr_get_crtc_info_reply_t* GetDisplayInfo(const std::string& display) const;
 
 private:
+    Logger m_logger;
+
     std::unordered_map<std::string, xcb_randr_get_crtc_info_reply_t*> m_displays;
 };
 
