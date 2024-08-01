@@ -18,6 +18,11 @@ public:
     ~Renderer();
 
     /**
+        A function that will initialize all the components positions to be at the correct point on the bar
+    */
+    void InitComponentsPositions();
+
+    /**
         Draws a rectangle from x, y to w, h with the colot BACKGROUND from general.config.h
 
         @param x Indicates the beginning X coordinate
@@ -74,20 +79,22 @@ public:
     inline void AddComponent(std::unique_ptr<Component> c){m_components.emplace_back(std::move(c));}
 
 private:
-    xcb_connection_t* m_conn;
+    xcb_connection_t* m_conn = nullptr;
     xcb_window_t& m_window;
     Logger m_logger;
+
+    xcb_get_geometry_reply_t* m_geometry = nullptr;
 
     void DrawUnderline(const xcb_rectangle_t& rect);
 
     std::array<uint32_t, 5> m_palette = {BACKGROUND, FOREGROUND, COLOR1, COLOR2, COLOR3};
 
-    xcb_font_t m_font;
-    int m_charWidth;
+    xcb_font_t m_font = 0;
+    int m_charWidth = 0;
 
-    xcb_gcontext_t m_drawGC;
-    xcb_gcontext_t m_clearGC;
-    xcb_gcontext_t m_underlineGC;
+    xcb_gcontext_t m_drawGC = 0;
+    xcb_gcontext_t m_clearGC = 0;
+    xcb_gcontext_t m_underlineGC = 0;
 
     std::vector<std::unique_ptr<Component>> m_components;
 };

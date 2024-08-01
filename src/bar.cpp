@@ -3,8 +3,6 @@
 #include "bar.h"
 #include "randr.h"
 
-#include "bar.config.h"
-
 #include "components/textComp.h"
 
 mibar::mibar(){
@@ -69,8 +67,9 @@ void mibar::EventLoop(){
 
     r.AddComponent(std::make_unique<TextComponent>(TEXT_MODULE_STR));
 
-    xcb_generic_event_t* e;
+    r.InitComponentsPositions();
 
+    xcb_generic_event_t* e;
     while((e = xcb_wait_for_event(m_conn))){
         switch(e->response_type & 0x7F){
         case XCB_EXPOSE:

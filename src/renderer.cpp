@@ -24,12 +24,24 @@ Renderer::Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w) 
 
     free(fontInfo);
     
+    m_geometry = xcb_get_geometry_reply(c, xcb_get_geometry(c, w), nullptr);
+
     xcb_close_font_checked(m_conn, m_font);
     xcb_flush(c);
 }
 
 Renderer::~Renderer(){
     m_components.clear();
+
+    delete m_geometry;
+    m_geometry = nullptr;
+}
+
+void Renderer::InitComponentsPositions(){
+    for(auto&& component : m_components){
+        component->y = m_geometry->height / 2 + 4 + PADDING_TOP; // We use xcb_image_text_8 so the text has a height of 8 pixels
+        component->x += PADDING_LEFT;
+    }
 }
 
 void Renderer::DrawRect(int16_t x, int16_t y, uint16_t w, uint16_t h, xcb_gcontext_t& gc){
@@ -41,17 +53,13 @@ void Renderer::Clear(int16_t x, int16_t y, uint16_t w, uint16_t h){
 }
 
 void Renderer::DrawComponents(const std::string& str, const int16_t x, const int16_t y){
-    xcb_get_geometry_reply_t* geom = xcb_get_geometry_reply(m_conn, xcb_get_geometry(m_conn, m_window), nullptr);
-    
     for(auto&& component : m_components){
         component->Draw(m_conn, m_window, m_drawGC);
 
         if(!ENABLE_UNDERLINE) continue;
 
-        DrawRect(component->x, geom->height - UNDERLINE_HEIGHT, component->GetWidth(m_charWidth), UNDERLINE_HEIGHT, m_underlineGC);
+        DrawRect(component->x, m_geometry->height - UNDERLINE_HEIGHT, component->GetWidth(m_charWidth), UNDERLINE_HEIGHT, m_underlineGC);
     }
-
-    free(geom);
 }
 
 void Renderer::SetForeground(uint32_t idx){
