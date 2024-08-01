@@ -52,7 +52,7 @@ void Renderer::Clear(int16_t x, int16_t y, uint16_t w, uint16_t h){
     DrawRect(x, y, w, h, m_clearGC);
 }
 
-void Renderer::DrawComponents(const std::string& str, const int16_t x, const int16_t y){
+void Renderer::DrawComponents(){
     for(auto&& component : m_components){
         component->Draw(m_conn, m_window, m_drawGC);
 

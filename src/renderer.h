@@ -48,7 +48,7 @@ public:
 
         @param TMP all the params are temp and should all be re-written
     */
-    void DrawComponents(const std::string& str, const int16_t x, const int16_t y);
+    void DrawComponents();
 
     /**
         A function to set the foreground color to a new color from the palette

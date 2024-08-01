@@ -75,7 +75,7 @@ void mibar::EventLoop(){
         case XCB_EXPOSE:
             r.Clear(0, 0, m_w, m_h);
 
-            r.DrawComponents(TEXT_MODULE_STR, TEXT_MODULE_X, TEXT_MODULE_Y);
+            r.DrawComponents();
             
             xcb_flush(m_conn);
             break;
