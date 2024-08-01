@@ -26,7 +26,7 @@ private:
     uint32_t m_winMask;
     uint32_t m_winValues[2];
 
-    std::shared_ptr<Logger> logger;
+    Logger m_logger;
 };
 
 #endif
