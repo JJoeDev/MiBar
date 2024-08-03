@@ -17,11 +17,6 @@
 #define BAR_X 0
 #define BAR_Y 0
 
-// Text module
-#define TEXT_MODULE_STR "Hello, World! This is still a demo build :D"
-#define TEXT_MODULE_X 345
-#define TEXT_MODULE_Y 0
-
 // Underline configuration
 #define ENABLE_UNDERLINE 1
 #define UNDERLINE_HEIGHT 3

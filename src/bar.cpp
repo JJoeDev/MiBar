@@ -2,8 +2,7 @@
 #include "utils.h"
 #include "bar.h"
 #include "randr.h"
-
-#include "components/textComp.h"
+#include "pluginManager.h"
 
 mibar::mibar(){
     m_logger.Log(__FILE_NAME__, __LINE__, "DEBUG BUILD", LogLvl::DBUG);
@@ -65,17 +64,15 @@ mibar::~mibar(){
 void mibar::EventLoop(){
     Renderer r(m_screen, m_conn, m_window);
 
-    r.AddComponent(std::make_unique<TextComponent>(TEXT_MODULE_STR));
-
-    r.InitComponentsPositions();
+    PluginManager pmgr;
+    pmgr.ExposeFuncToLua("Draw", [&r](const std::string& str){r.DrawStr(str.c_str(), str.length());});
 
     xcb_generic_event_t* e;
     while((e = xcb_wait_for_event(m_conn))){
         switch(e->response_type & 0x7F){
         case XCB_EXPOSE:
             r.Clear(0, 0, m_w, m_h);
-
-            r.DrawComponents();
+            pmgr.RunScripts();
             
             xcb_flush(m_conn);
             break;

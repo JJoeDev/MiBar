@@ -10,17 +10,10 @@
 #include "logger.h"
 #include "general.config.h"
 
-#include "components/component.h"
-
 class Renderer{
 public:
     Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w);
     ~Renderer();
-
-    /**
-        A function that will initialize all the components positions to be at the correct point on the bar
-    */
-    void InitComponentsPositions();
 
     /**
         Draws a rectangle from x, y to w, h with the colot BACKGROUND from general.config.h
@@ -44,13 +37,6 @@ public:
     void Clear(int16_t x, int16_t y, uint16_t w, uint16_t h);
 
     /**
-        A function that should be run in the event loop to draw all added components
-
-        @param TMP all the params are temp and should all be re-written
-    */
-    void DrawComponents();
-
-    /**
         A function to set the foreground color to a new color from the palette
 
         @param idx The index of the palette the foreground color should be set to
@@ -71,12 +57,7 @@ public:
     */
     void SetUnderline(uint32_t idx);
 
-    /**
-        Will add an object that inherits Component to a vector so the renderer can render all components
-
-        @param c Is a unique pointer to an object that inherits Component
-    */
-    inline void AddComponent(std::unique_ptr<Component> c){m_components.emplace_back(std::move(c));}
+    void DrawStr(const char* str, int len);
 
 private:
     xcb_connection_t* m_conn = nullptr;
@@ -91,12 +72,11 @@ private:
 
     xcb_font_t m_font = 0;
     int m_charWidth = 0;
+    int m_charHeight = 0;
 
     xcb_gcontext_t m_drawGC = 0;
     xcb_gcontext_t m_clearGC = 0;
     xcb_gcontext_t m_underlineGC = 0;
-
-    std::vector<std::unique_ptr<Component>> m_components;
 };
 
 #endif

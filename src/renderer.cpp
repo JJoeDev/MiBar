@@ -31,17 +31,8 @@ Renderer::Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w) 
 }
 
 Renderer::~Renderer(){
-    m_components.clear();
-
     delete m_geometry;
     m_geometry = nullptr;
-}
-
-void Renderer::InitComponentsPositions(){
-    for(auto&& component : m_components){
-        component->y = m_geometry->height / 2 + 4 + PADDING_TOP; // We use xcb_image_text_8 so the text has a height of 8 pixels
-        component->x += PADDING_LEFT;
-    }
 }
 
 void Renderer::DrawRect(int16_t x, int16_t y, uint16_t w, uint16_t h, xcb_gcontext_t& gc){
@@ -50,16 +41,6 @@ void Renderer::DrawRect(int16_t x, int16_t y, uint16_t w, uint16_t h, xcb_gconte
 
 void Renderer::Clear(int16_t x, int16_t y, uint16_t w, uint16_t h){
     DrawRect(x, y, w, h, m_clearGC);
-}
-
-void Renderer::DrawComponents(){
-    for(auto&& component : m_components){
-        component->Draw(m_conn, m_window, m_drawGC);
-
-        if(!ENABLE_UNDERLINE) continue;
-
-        DrawRect(component->x, m_geometry->height - UNDERLINE_HEIGHT, component->GetWidth(m_charWidth), UNDERLINE_HEIGHT, m_underlineGC);
-    }
 }
 
 void Renderer::SetForeground(uint32_t idx){
@@ -76,6 +57,10 @@ void Renderer::SetBackground(uint32_t idx){
 void Renderer::SetUnderline(uint32_t idx){
     assert(idx <= m_palette.size());
     xcb_change_gc(m_conn, m_underlineGC, XCB_GC_FOREGROUND, (const uint32_t[]){m_palette[idx]});
+}
+
+void Renderer::DrawStr(const char* str, int len){
+    xcb_image_text_8(m_conn, len, m_window, m_drawGC, 10, 20, str);
 }
 
 // PRIVATE
