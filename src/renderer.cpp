@@ -59,8 +59,8 @@ void Renderer::SetUnderline(uint32_t idx){
     xcb_change_gc(m_conn, m_underlineGC, XCB_GC_FOREGROUND, (const uint32_t[]){m_palette[idx]});
 }
 
-void Renderer::DrawStr(const char* str, int len){
-    xcb_image_text_8(m_conn, len, m_window, m_drawGC, 10, 20, str);
+void Renderer::DrawStr(const char* str, int len, int x){
+    xcb_image_text_8(m_conn, len, m_window, m_drawGC, x, 20, str);
 }
 
 // PRIVATE

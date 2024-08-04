@@ -65,7 +65,7 @@ void mibar::EventLoop(){
     Renderer r(m_screen, m_conn, m_window);
 
     PluginManager pmgr;
-    pmgr.ExposeFuncToLua("Draw", [&r](const std::string& str){r.DrawStr(str.c_str(), str.length());});
+    pmgr.ExposeFuncToLua("Draw", [&r](const std::string& str, const int x){r.DrawStr(str.c_str(), str.length(), x);});
 
     xcb_generic_event_t* e;
     while((e = xcb_wait_for_event(m_conn))){

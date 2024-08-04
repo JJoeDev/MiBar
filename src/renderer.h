@@ -57,7 +57,14 @@ public:
     */
     void SetUnderline(uint32_t idx);
 
-    void DrawStr(const char* str, int len);
+    /**
+        A function to render a string to the bar using the m_drawGC graphics context
+
+        @param str The string to draw on MiBar
+        @param len The length of the string
+        @param x The target X position to start the drawing on
+    */
+    void DrawStr(const char* str, int len, int x);
 
 private:
     xcb_connection_t* m_conn = nullptr;

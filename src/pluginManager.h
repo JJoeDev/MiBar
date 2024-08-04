@@ -16,7 +16,7 @@ public:
     PluginManager();
     ~PluginManager();
 
-    void ExposeFuncToLua(const std::string& funcName, std::function<void(const std::string&)> func);
+    void ExposeFuncToLua(const std::string& funcName, std::function<void(const std::string&, const int x)> func);
     void RunScripts();
 
 private:

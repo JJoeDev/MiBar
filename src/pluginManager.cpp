@@ -10,7 +10,7 @@ PluginManager::PluginManager(){
         m_logger.Log("", 0, "Plugin directory found at: " + m_pluginDir);
     }
 
-    lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os, sol::lib::coroutine);
+    lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os, sol::lib::string);
 
     for(auto&& entry : std::filesystem::directory_iterator(m_pluginDir)){
         if(entry.path().extension() == ".lua"){
@@ -24,9 +24,9 @@ PluginManager::~PluginManager(){
     
 }
 
-void PluginManager::ExposeFuncToLua(const std::string& funcName, std::function<void(const std::string&)> func){
-    lua[funcName] = [func](const std::string& arg){
-        func(arg);
+void PluginManager::ExposeFuncToLua(const std::string& funcName, std::function<void(const std::string&, const int x)> func){
+    lua[funcName] = [func](const std::string& arg, const int x){
+        func(arg, x);
     };
 }
 
