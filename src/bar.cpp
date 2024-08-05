@@ -3,6 +3,7 @@
 #include "bar.h"
 #include "randr.h"
 #include "pluginManager.h"
+#include <thread>
 
 mibar::mibar(){
     m_logger.Log(__FILE_NAME__, __LINE__, "DEBUG BUILD", LogLvl::DBUG);
@@ -61,23 +62,63 @@ mibar::~mibar(){
     
 }
 
-void mibar::EventLoop(){
+// void mibar::EventLoop(){
+//     Renderer r(m_screen, m_conn, m_window);
+
+//     PluginManager pmgr;
+//     pmgr.ExposeFuncToLua("DrawString", [&r](const std::string& str, const int x){r.DrawStr(str, x);});
+//     pmgr.ExposeFuncToLua("DrawRect", [&r](int x, int y, int w, int h, int idx){r.DrawRect(x, y, w, h, idx);});
+
+//     xcb_generic_event_t* e;
+//     while((e = xcb_wait_for_event(m_conn))){
+//         switch(e->response_type & 0x7F){
+//         case XCB_EXPOSE:
+//             r.Clear(0, 0, m_w, m_h);
+//             pmgr.RunScripts();
+            
+//             xcb_flush(m_conn);
+//             break;
+//         }
+
+//         free(e);
+//     }
+// }
+
+void mibar::EventLoop() {
     Renderer r(m_screen, m_conn, m_window);
 
     PluginManager pmgr;
-    pmgr.ExposeFuncToLua("Draw", [&r](const std::string& str, const int x){r.DrawStr(str.c_str(), str.length(), x);});
+    pmgr.ExposeFuncToLua("DrawString", [&r](const std::string& str, const int x){r.DrawStr(str, x);});
+    pmgr.ExposeFuncToLua("DrawRect", [&r](int x, int y, int w, int h, int idx){r.DrawRect(x, y, w, h, idx);});
+
+    using namespace std::chrono;
+
+    auto last_update = steady_clock::now();
+    const auto update_interval = 1s;
 
     xcb_generic_event_t* e;
-    while((e = xcb_wait_for_event(m_conn))){
-        switch(e->response_type & 0x7F){
-        case XCB_EXPOSE:
+    while (true) {
+        auto now = steady_clock::now();
+        if (now - last_update >= update_interval) {
+            std::cout << "AUTO UPDATE\n";
+            // Force update
             r.Clear(0, 0, m_w, m_h);
             pmgr.RunScripts();
-            
             xcb_flush(m_conn);
-            break;
+            last_update = now;
         }
 
-        free(e);
+        if ((e = xcb_poll_for_event(m_conn))) {
+            std::cout << "EXPOSE UPDATE\n";
+
+            r.Clear(0, 0, m_w, m_h);
+            pmgr.RunScripts();
+
+            xcb_flush(m_conn);
+            last_update = now;
+        } else {
+            // No events, but we already forced an update
+            std::this_thread::sleep_for(update_interval / 10); // Short sleep to avoid busy-waiting
+        }
     }
 }

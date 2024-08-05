@@ -11,6 +11,11 @@
 // Monitor for MiBar to find
 #define TARGET_MONITOR "HDMI-0"
 
+// Target font to use (To find available fonts use the xlsfonts command in a terminal)
+//#define FONT "-adobe-courier-bold-o-normal--0-0-100-100-m-0-iso10646-1"
+#define FONT "lucidasans-10"
+#define FONT_FALLBACK "fixed"
+
 // Bar configuration
 #define BAR_WIDTH 0
 #define BAR_HEIGHT 40
