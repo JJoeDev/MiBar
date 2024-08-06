@@ -64,17 +64,33 @@ void Renderer::SetUnderline(uint32_t idx){
     xcb_change_gc(m_conn, m_underlineGC, XCB_GC_FOREGROUND, (const uint32_t[]){m_palette[idx]});
 }
 
-void Renderer::DrawStr(const std::string& str, int x){
-    int width = 0;
-    int height = 0;
-    
+void Renderer::DrawStr(const std::string& str, ALIGNMENT align, int add_x){
+    int text_width = 0;
+    int text_height = 0;
+
+    int x;
+    int txt_y = BAR_HEIGHT / 2 + text_height / 2;
+    int under_y = BAR_HEIGHT - UNDERLINE_HEIGHT;
+
     auto size = GetStringSize(str);
     if(size.has_value()){
-        std::tie(width, height) = size.value();
+        std::tie(text_width, text_height) = size.value();
     }
 
-    xcb_image_text_8(m_conn, str.length(), m_window, m_drawGC, x, BAR_HEIGHT / 2 + height / 2, str.c_str());
-    DrawUnderline((const xcb_rectangle_t){(int16_t)x, BAR_HEIGHT - UNDERLINE_HEIGHT, static_cast<uint16_t>(width), BAR_HEIGHT});
+    switch(align){
+    case ALIGNMENT::LEFT:
+        x = add_x;
+        break;
+    case ALIGNMENT::CENTER:
+        x = m_geometry->width / 2 - text_width / 2 + add_x;
+        break;
+    case ALIGNMENT::RIGHT:
+        x = m_geometry->width - text_width - add_x;
+        break;
+    }
+
+    xcb_image_text_8(m_conn, str.length(), m_window, m_drawGC, x, txt_y, str.c_str());
+    DrawUnderline((const xcb_rectangle_t){static_cast<int16_t>(x), static_cast<int16_t>(under_y), static_cast<uint16_t>(text_width), BAR_HEIGHT});
 }
 
 // PRIVATE

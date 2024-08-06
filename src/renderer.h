@@ -12,6 +12,12 @@
 #include "logger.h"
 #include "general.config.h"
 
+enum class ALIGNMENT{
+    LEFT = 0,
+    CENTER,
+    RIGHT
+};
+
 class Renderer{
 public:
     Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w);
@@ -74,10 +80,10 @@ public:
         A function to render a string to the bar using the m_drawGC graphics context
 
         @param str The string to draw on MiBar
-        @param len The length of the string
+        @param align An enum to decide if we align from Left, Center, or Right
         @param x The target X position to start the drawing on
     */
-    void DrawStr(const std::string& str, int x);
+    void DrawStr(const std::string& str, ALIGNMENT align, int x);
 
 private:
     xcb_connection_t* m_conn = nullptr;
@@ -87,15 +93,13 @@ private:
     xcb_get_geometry_reply_t* m_geometry = nullptr;
 
     xcb_char2b_t* BuildChar2b_t(const char* str, size_t length);
-    // std::vector<xcb_char2b_t> BuildChar2b_t(const char* str, size_t length);
+
     std::optional<std::pair<int, int>> GetStringSize(const std::string& str);
     void DrawUnderline(const xcb_rectangle_t& rect);
 
     std::array<uint32_t, 5> m_palette = {BACKGROUND, FOREGROUND, COLOR1, COLOR2, COLOR3};
 
     xcb_font_t m_font = 0;
-    //int m_charWidth = 0;
-    //int m_charHeight = 0;
 
     xcb_gcontext_t m_drawGC = 0;
     xcb_gcontext_t m_clearGC = 0;

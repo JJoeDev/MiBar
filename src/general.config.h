@@ -12,7 +12,6 @@
 #define TARGET_MONITOR "HDMI-0"
 
 // Target font to use (To find available fonts use the xlsfonts command in a terminal)
-//#define FONT "-adobe-courier-bold-o-normal--0-0-100-100-m-0-iso10646-1"
 #define FONT "lucidasans-10"
 #define FONT_FALLBACK "fixed"
 
@@ -21,6 +20,11 @@
 #define BAR_HEIGHT 40
 #define BAR_X 0
 #define BAR_Y 0
+
+// If Automatic Updates is enabled the bar will call all lua plugins every set amount of time + when an event is recieved
+#define AUTOMATIC_UPDATES_ENABLE 1
+// The amount of time between updates in seconds
+#define UPDATE_TIME 30
 
 // Underline configuration
 #define ENABLE_UNDERLINE 1

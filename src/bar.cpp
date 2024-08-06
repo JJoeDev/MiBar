@@ -3,7 +3,10 @@
 #include "bar.h"
 #include "randr.h"
 #include "pluginManager.h"
+
+#if AUTOMATIC_UPDATES_ENABLE
 #include <thread>
+#endif
 
 mibar::mibar(){
     m_logger.Log(__FILE_NAME__, __LINE__, "DEBUG BUILD", LogLvl::DBUG);
@@ -62,39 +65,19 @@ mibar::~mibar(){
     
 }
 
-// void mibar::EventLoop(){
-//     Renderer r(m_screen, m_conn, m_window);
-
-//     PluginManager pmgr;
-//     pmgr.ExposeFuncToLua("DrawString", [&r](const std::string& str, const int x){r.DrawStr(str, x);});
-//     pmgr.ExposeFuncToLua("DrawRect", [&r](int x, int y, int w, int h, int idx){r.DrawRect(x, y, w, h, idx);});
-
-//     xcb_generic_event_t* e;
-//     while((e = xcb_wait_for_event(m_conn))){
-//         switch(e->response_type & 0x7F){
-//         case XCB_EXPOSE:
-//             r.Clear(0, 0, m_w, m_h);
-//             pmgr.RunScripts();
-            
-//             xcb_flush(m_conn);
-//             break;
-//         }
-
-//         free(e);
-//     }
-// }
-
 void mibar::EventLoop() {
     Renderer r(m_screen, m_conn, m_window);
 
     PluginManager pmgr;
-    pmgr.ExposeFuncToLua("DrawString", [&r](const std::string& str, const int x){r.DrawStr(str, x);});
+    pmgr.ExposeFuncToLua("DrawString", [&r](const std::string& str, ALIGNMENT align, const int x){r.DrawStr(str, align, x);});
     pmgr.ExposeFuncToLua("DrawRect", [&r](int x, int y, int w, int h, int idx){r.DrawRect(x, y, w, h, idx);});
 
+#if AUTOMATIC_UPDATES_ENABLE
     using namespace std::chrono;
 
     auto last_update = steady_clock::now();
-    const auto update_interval = 1s;
+    const auto update_interval = seconds(UPDATE_TIME);
+    const auto delay_interval = seconds(UPDATE_TIME / 10);
 
     xcb_generic_event_t* e;
     while (true) {
@@ -109,7 +92,7 @@ void mibar::EventLoop() {
         }
 
         if ((e = xcb_poll_for_event(m_conn))) {
-            std::cout << "EXPOSE UPDATE\n";
+            std::cout << "EXPOSE UPDATE + delay: " << delay_interval.count() << '\n';
 
             r.Clear(0, 0, m_w, m_h);
             pmgr.RunScripts();
@@ -118,7 +101,23 @@ void mibar::EventLoop() {
             last_update = now;
         } else {
             // No events, but we already forced an update
-            std::this_thread::sleep_for(update_interval / 10); // Short sleep to avoid busy-waiting
+            std::cout << "Hello delay thread: " << delay_interval.count() << '\n';
+            std::this_thread::sleep_for(delay_interval); // Short sleep to avoid busy-waiting
         }
     }
+#else
+    xcb_generic_event_t* e;
+    while((e = xcb_wait_for_event(m_conn))){
+        switch(e->response_type & 0x7F){
+        case XCB_EXPOSE:
+            r.Clear(0, 0, m_w, m_h);
+            pmgr.RunScripts();
+            
+            xcb_flush(m_conn);
+            break;
+        }
+
+        free(e);
+    }
+#endif
 }

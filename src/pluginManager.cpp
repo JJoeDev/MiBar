@@ -18,15 +18,21 @@ PluginManager::PluginManager(){
             m_logger.Log(__FILE_NAME__, 0, "Found plugin: " + entry.path().filename().string());
         }
     }
+
+    lua["Alignment"] = lua.create_table_with(
+        "LEFT", ALIGNMENT::LEFT,
+        "CENTER", ALIGNMENT::CENTER,
+        "RIGHT", ALIGNMENT::RIGHT
+    );
 }
 
 PluginManager::~PluginManager(){
     
 }
 
-void PluginManager::ExposeFuncToLua(const std::string& funcName, std::function<void(const std::string&, const int x)> func){
-    lua[funcName] = [func](const std::string& arg, const int x){
-        func(arg, x);
+void PluginManager::ExposeFuncToLua(const std::string& funcName, std::function<void(const std::string&, ALIGNMENT, const int)> func){
+    lua[funcName] = [func](const std::string& arg, ALIGNMENT align, const int x){
+        func(arg, align, x);
     };
 }
 
