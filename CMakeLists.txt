@@ -15,4 +15,13 @@ find_package(Lua REQUIRED)
 include_directories(${LUA_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME} ${SRC})
-target_link_libraries(${PROJECT_NAME} xcb xcb-util xcb-icccm xcb-randr ${LUA_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}
+    xcb
+    xcb-util
+    xcb-icccm
+    xcb-randr
+    xcb-image
+    xcb-shm
+    xcb-shape
+    ${LUA_LIBRARIES}
+)

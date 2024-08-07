@@ -18,12 +18,12 @@ public:
 private:
     // Basic connections
     xcb_connection_t* m_conn = nullptr;
-    xcb_screen_t* m_screen;
+    xcb_screen_t* m_screen = nullptr;
     xcb_window_t m_window = 0;
 
     int m_x, m_y, m_w, m_h;
 
-    uint32_t m_winMask;
+    uint32_t m_winMask = 0;
     uint32_t m_winValues[2];
 
     Logger m_logger;

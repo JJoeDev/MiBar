@@ -4,9 +4,11 @@
 #include "randr.h"
 #include "pluginManager.h"
 
-mibar::mibar(){
-    m_logger.Log(__FILE_NAME__, __LINE__, "DEBUG BUILD", LogLvl::DBUG);
+#if AUTOMATIC_UPDATES_ENABLE
+#include <thread>
+#endif
 
+mibar::mibar(){
     m_conn = xcb_connect(nullptr, nullptr);
     if(xcb_connection_has_error(m_conn)){
         m_logger.Log(__FILE_NAME__, __LINE__, "Could not connect to X server!", LogLvl::ERROR);
@@ -61,23 +63,50 @@ mibar::~mibar(){
     
 }
 
-void mibar::EventLoop(){
+void mibar::EventLoop() {
     Renderer r(m_screen, m_conn, m_window);
 
     PluginManager pmgr;
-    pmgr.ExposeFuncToLua("Draw", [&r](const std::string& str, const int x){r.DrawStr(str.c_str(), str.length(), x);});
+    pmgr.ExposeFuncToLua("DrawString", [&r](const std::string& str, ALIGNMENT align, const int x){r.DrawStr(str, align, x);});
+    pmgr.ExposeFuncToLua("DrawRect", [&r](int x, int y, int w, int h, int idx){r.DrawRect(x, y, w, h, idx);});
+
+#if AUTOMATIC_UPDATES_ENABLE
+    using namespace std::chrono;
+
+    auto last_update = steady_clock::now();
+    const auto update_interval = seconds(UPDATE_TIME);
+#endif
 
     xcb_generic_event_t* e;
-    while((e = xcb_wait_for_event(m_conn))){
-        switch(e->response_type & 0x7F){
-        case XCB_EXPOSE:
-            r.Clear(0, 0, m_w, m_h);
-            pmgr.RunScripts();
-            
-            xcb_flush(m_conn);
-            break;
+    while (true) {
+        if ((e = xcb_poll_for_event(m_conn))) {
+            if (e) {
+                switch (e->response_type & 0x7F) {
+                case XCB_EXPOSE:
+                    r.Clear(0, 0, m_w, m_h);
+                    pmgr.RunScripts();
+                    xcb_flush(m_conn);
+                    break;
+                default:
+                    // Handle other events if needed
+                    break;
+                }
+                free(e);
+            }
         }
-
-        free(e);
+#if AUTOMATIC_UPDATES_ENABLE
+        else {
+            auto now = steady_clock::now();
+            if (now - last_update >= update_interval) {
+                // Force update
+                r.Clear(0, 0, m_w, m_h);
+                pmgr.RunScripts();
+                xcb_flush(m_conn);
+                last_update = now;
+            }
+            // Yield CPU time to other threads
+            std::this_thread::yield();
+        }
+#endif
     }
 }
