@@ -1,5 +1,3 @@
-(image generated with [github-profile-header-generator](https://github.com/leviarista/github-profile-header-generator?tab=readme-ov-file))
-
 # MiBar
 
 > [!WARNING]
@@ -7,6 +5,7 @@
 > MiBar is at a usable 
 
 ![Header_image](./github_assets/github-header-image.png)
+(image generated with [github-profile-header-generator](https://github.com/leviarista/github-profile-header-generator?tab=readme-ov-file))
 
 MiBar is a simple Linux X11 status bar with Lua support
 
