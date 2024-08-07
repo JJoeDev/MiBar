@@ -40,7 +40,6 @@ void Renderer::DrawRect(int16_t x, int16_t y, uint16_t w, uint16_t h, xcb_gconte
 
 void Renderer::DrawRect(int16_t x, int16_t y, uint16_t w, uint16_t h, int idx){
     SetForeground(4);
-    printf("COORDS X: %i | Y: %i | W: %i | H: %i\n", x, y, w, h);
     DrawRect(x, y, w, h, m_drawGC);
 }
 
@@ -68,14 +67,14 @@ void Renderer::DrawStr(const std::string& str, ALIGNMENT align, int add_x){
     int text_width = 0;
     int text_height = 0;
 
-    int x;
-    int txt_y = BAR_HEIGHT / 2 + text_height / 2;
-    int under_y = BAR_HEIGHT - UNDERLINE_HEIGHT;
-
     auto size = GetStringSize(str);
     if(size.has_value()){
         std::tie(text_width, text_height) = size.value();
     }
+
+    int x;
+    int txt_y = BAR_HEIGHT / 2 + text_height / 2;
+    int under_y = BAR_HEIGHT - UNDERLINE_HEIGHT;
 
     switch(align){
     case ALIGNMENT::LEFT:

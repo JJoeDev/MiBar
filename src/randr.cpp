@@ -63,6 +63,5 @@ const xcb_randr_get_crtc_info_reply_t* Randr::GetDisplayInfo(const std::string& 
         }
     }
 
-    //m_logger.Log(__FILE_NAME__, __LINE__, "Could not find display with name: " + display, LogLvl::ERROR);
     return nullptr;
 }

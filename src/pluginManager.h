@@ -24,7 +24,7 @@ public:
 private:
     Logger m_logger;
 
-    std::string m_pluginDir;
+    std::string m_pluginDir = "";
 
     sol::state lua;
 

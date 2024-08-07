@@ -9,8 +9,6 @@
 #endif
 
 mibar::mibar(){
-    m_logger.Log(__FILE_NAME__, __LINE__, "DEBUG BUILD", LogLvl::DBUG);
-
     m_conn = xcb_connect(nullptr, nullptr);
     if(xcb_connection_has_error(m_conn)){
         m_logger.Log(__FILE_NAME__, __LINE__, "Could not connect to X server!", LogLvl::ERROR);
@@ -77,47 +75,38 @@ void mibar::EventLoop() {
 
     auto last_update = steady_clock::now();
     const auto update_interval = seconds(UPDATE_TIME);
-    const auto delay_interval = seconds(UPDATE_TIME / 10);
+#endif
 
     xcb_generic_event_t* e;
     while (true) {
-        auto now = steady_clock::now();
-        if (now - last_update >= update_interval) {
-            std::cout << "AUTO UPDATE\n";
-            // Force update
-            r.Clear(0, 0, m_w, m_h);
-            pmgr.RunScripts();
-            xcb_flush(m_conn);
-            last_update = now;
-        }
-
         if ((e = xcb_poll_for_event(m_conn))) {
-            std::cout << "EXPOSE UPDATE + delay: " << delay_interval.count() << '\n';
-
-            r.Clear(0, 0, m_w, m_h);
-            pmgr.RunScripts();
-
-            xcb_flush(m_conn);
-            last_update = now;
-        } else {
-            // No events, but we already forced an update
-            std::cout << "Hello delay thread: " << delay_interval.count() << '\n';
-            std::this_thread::sleep_for(delay_interval); // Short sleep to avoid busy-waiting
+            if (e) {
+                switch (e->response_type & 0x7F) {
+                case XCB_EXPOSE:
+                    r.Clear(0, 0, m_w, m_h);
+                    pmgr.RunScripts();
+                    xcb_flush(m_conn);
+                    break;
+                default:
+                    // Handle other events if needed
+                    break;
+                }
+                free(e);
+            }
         }
-    }
-#else
-    xcb_generic_event_t* e;
-    while((e = xcb_wait_for_event(m_conn))){
-        switch(e->response_type & 0x7F){
-        case XCB_EXPOSE:
-            r.Clear(0, 0, m_w, m_h);
-            pmgr.RunScripts();
-            
-            xcb_flush(m_conn);
-            break;
+#if AUTOMATIC_UPDATES_ENABLE
+        else {
+            auto now = steady_clock::now();
+            if (now - last_update >= update_interval) {
+                // Force update
+                r.Clear(0, 0, m_w, m_h);
+                pmgr.RunScripts();
+                xcb_flush(m_conn);
+                last_update = now;
+            }
+            // Yield CPU time to other threads
+            std::this_thread::yield();
         }
-
-        free(e);
-    }
 #endif
+    }
 }
