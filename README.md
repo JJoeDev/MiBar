@@ -47,6 +47,12 @@ Once MiBar has bin built from source the executable can be found in the bin dire
 $ ./bin/MiBar
 ```
 
+## Configuring
+
+Currently the bar uses a C header file for its configuration, when changing this file you will need to recompile the application again.
+
+The configuration file can be found in [src/general.config.h](./src/general.config.h)
+
 ## Images
 
 ![Image_1](./github_assets/DemoBar.png)
