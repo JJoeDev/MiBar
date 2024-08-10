@@ -1,0 +1,42 @@
+* Comment. Comments can only be placed before the ':' as to not interfer with some settings
+
+* Colors. Colors use the hexadecimal format and are prefixed with 0x
+* Hexadecimal values go from 0 to F (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F)
+* The colors are formatted as 0xRR GG BB where RR, GG, and BB reprecent red green and blue
+* MiBar has support for 5 colors, all assigned a value as below
+* Currently not all values are in use, but they will be in the future
+
+Background: 0x111111
+Foreground: 0x999999
+Color1: 0x777777
+Color2: 0x555555
+Color3: 0x333333
+
+* TargetMonitor is the monitor MiBar should locate and move to
+
+TargetMonitor: HDMI-0
+
+* Currently MiBar only supports fronts built in to X.
+* These fonts can be listed with a utility like 'xlsfonts' in a terminal
+
+Font: lucidasans-10
+FontFallback: fixed
+
+* The transform values are additive to the information recieved from TargetMonitor
+* This means if the monitor is 1920 wide and BarWidth is 0 then the bar is also 1920 wide
+* To make the bar slimmer BarWidth needs to be a negative number
+* BarHeight is not aditive and is 0 high by default
+* BarX and BarY is the monitor coordinates for where to draw the bar at
+
+BarWidth: 0
+BarHeight: 32
+BarX: 0
+BarY: 0
+
+* The following settings are to render a small line under every rendered component on the bar
+* UseUnderline will be false unless its value is directly "true"
+
+UseUnderlines: true
+UnderlineHeight: 3
+UnderlineOffsetX: 0
+UnderlineOffsetY: 0

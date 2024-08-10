@@ -8,9 +8,9 @@
 
 #include <xcb/xcb.h>
 
+#include "configParser.h"
 #include "utils.h"
 #include "logger.h"
-#include "general.config.h"
 
 enum class ALIGNMENT{
     LEFT = 0,
@@ -20,7 +20,7 @@ enum class ALIGNMENT{
 
 class Renderer{
 public:
-    Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w);
+    Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w, const ConfigParser& cfg);
     ~Renderer();
 
     /**
@@ -92,12 +92,15 @@ private:
 
     xcb_get_geometry_reply_t* m_geometry = nullptr;
 
+    bool m_underlineEnabled = true;
+    int m_underlineHeight = 0;
+
     xcb_char2b_t* BuildChar2b_t(const char* str, size_t length);
 
     std::optional<std::pair<int, int>> GetStringSize(const std::string& str);
     void DrawUnderline(const xcb_rectangle_t& rect);
 
-    std::array<uint32_t, 5> m_palette = {BACKGROUND, FOREGROUND, COLOR1, COLOR2, COLOR3};
+    std::array<uint32_t, 5> m_palette = {};
 
     xcb_font_t m_font = 0;
 

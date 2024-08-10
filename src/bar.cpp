@@ -8,7 +8,15 @@
 #include <thread>
 #endif
 
-mibar::mibar(){
+MiBar::MiBar(const std::string& file){
+    //ConfigParser cfg(file);
+    m_cfg.Parse(file);
+
+    m_configX = std::stoi(m_cfg.GetConfig(BAR_X)); 
+    m_configY = std::stoi(m_cfg.GetConfig(BAR_Y));
+    m_configW = std::stoi(m_cfg.GetConfig(BAR_W));
+    m_configH = std::stoi(m_cfg.GetConfig(BAR_H));
+
     m_conn = xcb_connect(nullptr, nullptr);
     if(xcb_connection_has_error(m_conn)){
         m_logger.Log(__FILE_NAME__, __LINE__, "Could not connect to X server!", LogLvl::ERROR);
@@ -22,12 +30,12 @@ mibar::mibar(){
     m_winValues[1] = XCB_EVENT_MASK_EXPOSURE;
 
     Randr r(m_conn, m_screen);
-    const auto mon = r.GetDisplayInfo(TARGET_MONITOR);
+    const auto mon = r.GetDisplayInfo(m_cfg.GetConfig(TARGET_MON));
 
-    m_x = mon->x + BAR_X;
-    m_y = mon->y + BAR_Y;
-    m_w = mon->width + BAR_WIDTH;
-    m_h = BAR_HEIGHT;
+    m_x = mon->x + m_configX;
+    m_y = mon->y + m_configY;
+    m_w = mon->width + m_configW;
+    m_h = m_configH;
 
     m_window = xcb_generate_id(m_conn);
     xcb_create_window(m_conn,
@@ -48,23 +56,25 @@ mibar::mibar(){
 
     // EWMH (Extended Window Manager Hint) Reserve space for bar
     xcb_atom_t wmStrutPartialAtom = GetAtom(m_conn, "_NET_WM_STRUT_PARTIAL");
-    uint32_t strut[12] = {0}; // https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
+    uint32_t strut[12]{}; // https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html section 5.10
+    strut[2] = m_h + m_configY;
 
     xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStrutPartialAtom, XCB_ATOM_CARDINAL, 32, 12, strut);
 
     // Set window title
-    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, sizeof(char*), 5, "MiBar"); // 5 = 5 chars
+    std::string windowTitle = "MiBar_" + m_cfg.GetConfig(TARGET_MON);
+    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, sizeof(char*), windowTitle.size(), windowTitle.c_str());
 
     xcb_map_window(m_conn, m_window);
     xcb_flush(m_conn);
 }
 
-mibar::~mibar(){
+MiBar::~MiBar(){
     
 }
 
-void mibar::EventLoop() {
-    Renderer r(m_screen, m_conn, m_window);
+void MiBar::EventLoop() {
+    Renderer r(m_screen, m_conn, m_window, m_cfg);
 
     PluginManager pmgr;
     pmgr.ExposeFuncToLua("DrawString", [&r](const std::string& str, ALIGNMENT align, const int x){r.DrawStr(str, align, x);});
