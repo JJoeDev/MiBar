@@ -4,11 +4,12 @@
 #include <xcb/xcb.h>
 
 #include "logger.h"
+#include "configParser.h"
 
-class mibar{
+class MiBar{
 public:
-    mibar();
-    ~mibar();
+    MiBar(const std::string& file);
+    ~MiBar();
 
     /**
         Run the XCB event loop. This loop waits for exposure events to know when to re-render the bar
@@ -16,10 +17,17 @@ public:
     void EventLoop();
 
 private:
+    ConfigParser m_cfg;
+
     // Basic connections
     xcb_connection_t* m_conn = nullptr;
     xcb_screen_t* m_screen = nullptr;
     xcb_window_t m_window = 0;
+
+    int m_configX = 0;
+    int m_configY = 0;
+    int m_configW = 0;
+    int m_configH = 0;
 
     int m_x, m_y, m_w, m_h;
 

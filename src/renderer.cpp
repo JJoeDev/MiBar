@@ -6,14 +6,22 @@
 
 #include "renderer.h"
 
-Renderer::Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w) : m_conn(c), m_window(w){
+Renderer::Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w, const ConfigParser& cfg) : m_conn(c), m_window(w){
+    // Load Background, Foreground, Color1, Color2, Color3 to m_palette
+    for(int i = 0; i < 5; ++i){ // 5 colors available
+        m_palette[i] = std::stoul(cfg.GetConfig(i), nullptr, 16);
+    }
+
     // Font loading
     m_font = xcb_generate_id(c);
 
-    xcb_void_cookie_t fontCookie = xcb_open_font_checked(c, m_font, strlen(FONT), FONT);
+    const std::string font = cfg.GetConfig(FONT);
+    const std::string fallbackFont = cfg.GetConfig(FB_FONT);
+
+    xcb_void_cookie_t fontCookie = xcb_open_font_checked(c, m_font, font.size(), font.c_str());
     if(!TestCookie(fontCookie, c)){
         m_logger.Log(__FILE_NAME__, __LINE__, "Could not open user-defined font. Trying Fallback font", LogLvl::WARNING);
-        xcb_open_font_checked(c, m_font, strlen(FONT_FALLBACK), FONT_FALLBACK);
+        xcb_open_font_checked(c, m_font, fallbackFont.size(), fallbackFont.c_str());
     }
 
     // Initialize graphic contexts
@@ -25,8 +33,12 @@ Renderer::Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w) 
     xcb_create_gc(c, m_clearGC, w, XCB_GC_FOREGROUND, (const uint32_t[]){m_palette[0]});
     xcb_create_gc(c, m_underlineGC, w, XCB_GC_FOREGROUND, (const uint32_t[]){m_palette[4]});
 
-    // Get Window Geometry
+    // Get Geometry
     m_geometry = xcb_get_geometry_reply(c, xcb_get_geometry(c, w), nullptr);
+
+    // Underline
+    m_underlineEnabled = (cfg.GetConfig(USE_UNDERL) == "true") ? true : false;
+    m_underlineHeight = std::stoi(cfg.GetConfig(UNDERL_H));
 }
 
 Renderer::~Renderer(){
@@ -73,8 +85,8 @@ void Renderer::DrawStr(const std::string& str, ALIGNMENT align, int add_x){
     }
 
     int x;
-    int txt_y = BAR_HEIGHT / 2 + text_height / 2;
-    int under_y = BAR_HEIGHT - UNDERLINE_HEIGHT;
+    const int txt_y = m_geometry->height / 2 + text_height / 2;
+    const int under_y = m_geometry->height - m_underlineHeight;
 
     switch(align){
     case ALIGNMENT::LEFT:
@@ -89,7 +101,9 @@ void Renderer::DrawStr(const std::string& str, ALIGNMENT align, int add_x){
     }
 
     xcb_image_text_8(m_conn, str.length(), m_window, m_drawGC, x, txt_y, str.c_str());
-    DrawUnderline((const xcb_rectangle_t){static_cast<int16_t>(x), static_cast<int16_t>(under_y), static_cast<uint16_t>(text_width), BAR_HEIGHT});
+
+    if(!m_underlineEnabled) return;
+    DrawUnderline((const xcb_rectangle_t){static_cast<int16_t>(x), static_cast<int16_t>(under_y), static_cast<uint16_t>(text_width), m_geometry->height});
 }
 
 // PRIVATE
