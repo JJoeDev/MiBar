@@ -50,10 +50,10 @@ MiBar has migrated from a C header file for configuration, to a .bar configurati
 Building from source is as quick as running the following commands once.
 
 ```
-$ git clone https://github.com/JJoeDev/MiBar.git
+$ git clone https://github.com/JJoeDev/MiBar.git --recursive
 $ cd MiBar
 $ cmake -DCMAKE_BUILD_TYPE=Release .
-$ make
+$ make -j
 ```
 
 ### Running MiBar

@@ -1,0 +1,3 @@
+[submodule "external/sol"]
+	path = external/sol
+	url = https://github.com/ThePhD/sol2.git
