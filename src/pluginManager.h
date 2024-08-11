@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <functional>
 
-#include <sol/sol.hpp>
+#include "solInclude.h"
 
 #include "renderer.h"
 #include "logger.h"
