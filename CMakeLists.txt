@@ -11,9 +11,8 @@ file(GLOB_RECURSE SRC src/*.cpp)
 
 # Find Lua
 find_package(Lua REQUIRED)
-add_subdirectory(${CMAKE_BINARY_DIR}/external/sol/single)
 
-include_directories(${LUA_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/external/sol/single/include)
+include_directories(${LUA_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/external/sol/include)
 
 add_executable(${PROJECT_NAME} ${SRC})
 target_link_libraries(${PROJECT_NAME}
