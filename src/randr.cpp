@@ -117,7 +117,6 @@ const xcb_randr_get_crtc_info_reply_t* Randr::GetPrimaryDisplay(xcb_connection_t
         int y = crtc->y;
 
         auto m = crtc->mode;
-        
 
         if(x < minX || (x == minX && y < minY)){
             minX = x;

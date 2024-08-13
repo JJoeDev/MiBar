@@ -48,33 +48,11 @@ void ConfigParser::Parse(const std::string& file){
             std::cerr << "Missing value for key: " << key << '\n';
         }
     }
-
-    // Parsing config file
-    // std::fstream infile(configDir);
-
-    // std::string line;
-    // while(std::getline(infile, line)){
-    //     std::istringstream isLine(line);
-    //     std::string key;
-
-    //     if(std::getline(isLine, key, ':')){
-    //         if(key.find('*') != std::string::npos) continue;
-
-    //         std::string value;
-    //         if(std::getline(isLine, value)){
-    //             value.erase(std::remove_if(value.begin(), value.end(), ::isspace), value.end());
-    //             m_configs[key] = value;
-    //         }
-    //     }
-    // }
 }
 
 const std::string ConfigParser::GetConfig(const int key) const {
     if(auto it = m_configs.find(m_configTable[key]); it != m_configs.end())
         return it->second;
-    else
-        return "0x0";
 
-    // auto it = m_configs.find(m_configTable[key]);
-    // return it->second;
+    return "0x0";
 }

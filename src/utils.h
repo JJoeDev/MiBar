@@ -35,7 +35,7 @@ inline xcb_atom_t GetAtom(xcb_connection_t* conn, const char* atomName){
 */
 inline bool TestCookie(xcb_void_cookie_t cookie, xcb_connection_t* conn){
     xcb_generic_error_t* err = xcb_request_check(conn, cookie);
-    return err ? false : true;
+    return err ? true : false;
 }
 
 #endif
