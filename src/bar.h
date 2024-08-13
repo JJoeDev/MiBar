@@ -17,6 +17,8 @@ public:
     void EventLoop();
 
 private:
+    void SetProps();
+
     ConfigParser m_cfg;
 
     // Basic connections

@@ -5,7 +5,7 @@
 
 #include "logger.h"
 
-enum cfgVars {
+enum CFG_TYPE {
     BG_COL = 0,
     FG_COL,
     COL1,
@@ -32,13 +32,12 @@ public:
 
     void Parse(const std::string& file = "config");
 
-    //const std::string GetConfig(const std::string& key) const;
     const std::string GetConfig(const int key) const;
 
 private:
     std::unordered_map<std::string, std::string> m_configs;
 
-    const char* m_configTable[CFG_COUNT]{
+    const char* m_configTable[CFG_TYPE::CFG_COUNT]{
         "Background",
         "Foreground",
         "Color1",

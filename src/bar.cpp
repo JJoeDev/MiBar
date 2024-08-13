@@ -9,7 +9,6 @@
 #endif
 
 MiBar::MiBar(const std::string& file){
-    //ConfigParser cfg(file);
     m_cfg.Parse(file);
 
     m_configX = std::stoi(m_cfg.GetConfig(BAR_X)); 
@@ -30,7 +29,12 @@ MiBar::MiBar(const std::string& file){
     m_winValues[1] = XCB_EVENT_MASK_EXPOSURE;
 
     Randr r(m_conn, m_screen);
-    const auto mon = r.GetDisplayInfo(m_cfg.GetConfig(TARGET_MON));
+    auto mon = r.GetDisplayInfo(m_cfg.GetConfig(TARGET_MON));
+
+    if(!mon){
+        m_logger.Log(__FILE_NAME__, __LINE__, "Could not find monitor from config.bar. Attempting to find primary monitor", LogLvl::ERROR);
+        mon = r.GetPrimaryDisplay(m_conn, m_window);
+    }
 
     m_x = mon->x + m_configX;
     m_y = mon->y + m_configY;
@@ -50,20 +54,7 @@ MiBar::MiBar(const std::string& file){
                       m_winMask,
                       m_winValues);
 
-    xcb_atom_t wmTypeAtom = GetAtom(m_conn, "_NET_WM_WINDOW_TYPE");
-    xcb_atom_t wmTypeDockAtom = GetAtom(m_conn, "_NET_WM_WINDOW_TYPE_DOCK");
-    xcb_change_property(m_conn, XCB_PROP_MODE_PREPEND, m_window, wmTypeAtom, XCB_ATOM_ATOM, 32, 1, &wmTypeDockAtom);
-
-    // EWMH (Extended Window Manager Hint) Reserve space for bar
-    xcb_atom_t wmStrutPartialAtom = GetAtom(m_conn, "_NET_WM_STRUT_PARTIAL");
-    uint32_t strut[12]{}; // https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html section 5.10
-    strut[2] = m_h + m_configY;
-
-    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStrutPartialAtom, XCB_ATOM_CARDINAL, 32, 12, strut);
-
-    // Set window title
-    std::string windowTitle = "MiBar_" + m_cfg.GetConfig(TARGET_MON);
-    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, sizeof(char*), windowTitle.size(), windowTitle.c_str());
+    SetProps();
 
     xcb_map_window(m_conn, m_window);
     xcb_flush(m_conn);
@@ -119,4 +110,39 @@ void MiBar::EventLoop() {
         }
 #endif
     }
+}
+
+// PRIVATES
+
+void MiBar::SetProps(){ // https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
+    xcb_atom_t wmTypeAtom = GetAtom(m_conn, "_NET_WM_WINDOW_TYPE");
+    xcb_atom_t wmTypeDockAtom = GetAtom(m_conn, "_NET_WM_WINDOW_TYPE_DOCK");
+    xcb_change_property(m_conn, XCB_PROP_MODE_PREPEND, m_window, wmTypeAtom, XCB_ATOM_ATOM, 32, 1, &wmTypeDockAtom);
+
+    xcb_atom_t wmStateAtom = GetAtom(m_conn, "_NET_WM_STATE");
+    xcb_atom_t wmStateAtoms[] = {GetAtom(m_conn, "_NET_WM_STATE_STICKY"), GetAtom(m_conn, "_NET_WM_STATE_ABOVE")};
+    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStateAtom, XCB_ATOM_ATOM, 32, 2, wmStateAtoms);
+
+    xcb_atom_t wmStrutAtom = GetAtom(m_conn, "_NET_WM_STRUT");
+    uint32_t strut[4]{
+        0,0,
+        static_cast<uint32_t>(m_h + m_configY),
+        0
+    };
+    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStateAtom, XCB_ATOM_CARDINAL, 32, 4, strut);
+
+    // EWMH (Extended Window Manager Hint) Reserve space for bar
+    xcb_atom_t wmStrutPartialAtom = GetAtom(m_conn, "_NET_WM_STRUT_PARTIAL");
+    const uint32_t strutPartial[12]{
+        0,0,
+        static_cast<uint32_t>(m_h + m_configY),
+        0,0,0,0,0,0,0,0,0
+    };
+    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStrutPartialAtom, XCB_ATOM_CARDINAL, 32, 12, strutPartial);
+
+    // Set window title
+    std::string windowTitle = "MiBar_" + m_cfg.GetConfig(TARGET_MON);
+    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, sizeof(char*), windowTitle.size(), windowTitle.c_str());
+
+    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, XCB_ATOM_WM_CLASS, XCB_ATOM_STRING, sizeof(char*), 5, "MiBar");
 }

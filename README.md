@@ -31,6 +31,8 @@ MiBar is supposed to be customizable and easy to configure. This is the reason f
 
 * [Plugin Development](#plugin-development)
 
+* [In Development](#in-development)
+
 * [License](#license)
 
 ## Getting Started
@@ -160,6 +162,17 @@ DrawString(time, Alignment.CENTER, 0)
 ```
 
 For a visual example of this script take a look at the third [image](#images)
+
+## In Development
+
+This is a simple list of what I am working on for future releases
+
+| List of stuff I want to work on |
+| - |
+| DPI Scaling |
+| Initial boot auto creates config.bar |
+| Initial boot auto grabs primary monitor for config.bar |
+| Renderer switching to cairo or something similar |
 
 ## License
 

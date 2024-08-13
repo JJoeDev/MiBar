@@ -20,27 +20,39 @@ void ConfigParser::Parse(const std::string& file){
 
     configDir += ".bar";
 
-    // Parsing config file
-    std::fstream infile(configDir);
+    std::ifstream infile(configDir);
+    if(!infile){
+        std::cerr << "Error opening config file! : " << configDir << '\n';
+        return;
+    }
 
-    std::string line;
+    std::stringstream lineStream;
+    std::string line, key, value;
+
     while(std::getline(infile, line)){
-        std::istringstream isLine(line);
-        std::string key;
+        if(line.empty() || line[0] == '*') continue;
 
-        if(std::getline(isLine, key, ':')){
-            if(key.find('*') != std::string::npos) continue;
+        lineStream.clear();
+        lineStream << line;
 
-            std::string value;
-            if(std::getline(isLine, value)){
-                value.erase(std::remove_if(value.begin(), value.end(), ::isspace), value.end());
-                m_configs[key] = value;
-            }
+        if(!std::getline(lineStream, key, ':')){
+            std::cerr << "Invalid config! : " << line << '\n';
+            continue;
+        }
+
+        if(std::getline(lineStream, value)){
+            value.erase(std::remove_if(value.begin(), value.end(), ::isspace), value.end());
+            m_configs[key] = value;
+        }
+        else{
+            std::cerr << "Missing value for key: " << key << '\n';
         }
     }
 }
 
 const std::string ConfigParser::GetConfig(const int key) const {
-    auto it = m_configs.find(m_configTable[key]);
-    return it->second;
+    if(auto it = m_configs.find(m_configTable[key]); it != m_configs.end())
+        return it->second;
+
+    return "0x0";
 }
