@@ -128,7 +128,7 @@ std::optional<std::pair<int, int>> Renderer::GetStringSize(const std::string& st
     reply = xcb_query_text_extents_reply(m_conn, cookie, nullptr);
 
     if(reply == nullptr){
-        m_logger.Log(__FILE_NAME__, __LINE__, "Reply got an error!", LogLvl::ERROR);
+        m_logger.Log(__FILE_NAME__, __LINE__, "Could not find a font! Please look through config.bar", LogLvl::ERROR);
         return std::nullopt;
     }
 

@@ -30,7 +30,12 @@ MiBar::MiBar(const std::string& file){
     m_winValues[1] = XCB_EVENT_MASK_EXPOSURE;
 
     Randr r(m_conn, m_screen);
-    const auto mon = r.GetDisplayInfo(m_cfg.GetConfig(TARGET_MON));
+    auto mon = r.GetDisplayInfo(m_cfg.GetConfig(TARGET_MON));
+
+    if(!mon){
+        m_logger.Log(__FILE_NAME__, __LINE__, "Could not find monitor from config.bar. Attempting to find primary monitor", LogLvl::ERROR);
+        mon = r.GetPrimaryDisplay(m_conn, m_window);
+    }
 
     m_x = mon->x + m_configX;
     m_y = mon->y + m_configY;

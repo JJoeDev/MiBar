@@ -4,3 +4,4 @@ Makefile
 *.cmake
 CMakeCache.*
 TODO
+.clangd

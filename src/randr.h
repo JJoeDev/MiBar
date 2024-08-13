@@ -21,6 +21,7 @@ public:
         @return Returns a pointer to the crtc info reply containing info such as scale and position
     */
     const xcb_randr_get_crtc_info_reply_t* GetDisplayInfo(const std::string& display) const;
+    const xcb_randr_get_crtc_info_reply_t* GetPrimaryDisplay(xcb_connection_t* c, xcb_window_t w) const;
 
 private:
     Logger m_logger;
