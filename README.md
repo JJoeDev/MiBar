@@ -2,7 +2,7 @@
 
 > [!WARNING]
 >
-> MiBar is at a usable 
+> MiBar is at a usable state, but there is still a lot to do
 
 ![Header_image](./github_assets/github-header-image.png)
 (image generated with [github-profile-header-generator](https://github.com/leviarista/github-profile-header-generator?tab=readme-ov-file))
@@ -62,6 +62,7 @@ $ make -j
 
 MiBar can be run without any arguments, this will make it look for its own configuration file `config.bar` in `~/.config/MiBar` if this file does not exist the app cannot launch. There is an example file in the example repo
 ```
+$ mv examples/config.bar ~/.config/MiBar
 $ ./bin/MiBar
 ```
 
