@@ -129,7 +129,7 @@ void MiBar::SetProps(){ // https://specifications.freedesktop.org/wm-spec/1.3/ar
         static_cast<uint32_t>(m_h + m_configY),
         0
     };
-    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStateAtom, XCB_ATOM_CARDINAL, 32, 4, strut);
+    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStrutAtom, XCB_ATOM_CARDINAL, 32, 4, strut);
 
     // EWMH (Extended Window Manager Hint) Reserve space for bar
     xcb_atom_t wmStrutPartialAtom = GetAtom(m_conn, "_NET_WM_STRUT_PARTIAL");
