@@ -22,7 +22,7 @@ public:
     void RunScripts();
 
 private:
-    Logger m_logger;
+    std::shared_ptr<Logger> m_logger;
 
     std::string m_pluginDir = "";
 

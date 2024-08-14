@@ -24,7 +24,7 @@ public:
     const xcb_randr_get_crtc_info_reply_t* GetPrimaryDisplay(xcb_connection_t* c, xcb_window_t w) const;
 
 private:
-    Logger m_logger;
+    std::shared_ptr<Logger> m_logger;
 
     std::unordered_map<std::string, xcb_randr_get_crtc_info_reply_t*> m_displays;
 };

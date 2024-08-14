@@ -4,10 +4,10 @@ PluginManager::PluginManager(){
     m_pluginDir = std::filesystem::path(getenv("HOME")) / ".config/MiBar/plugins";
 
     if(std::filesystem::create_directories(m_pluginDir)){
-        m_logger.Log("", 0, "Created plugin directory at: " + m_pluginDir);
+        m_logger->Log("Plugin Manager", __LINE__, "Created new plugin directory at: " + m_pluginDir, LogLevel::INFO);
     }
     else{
-        m_logger.Log("", 0, "Plugin directory found at: " + m_pluginDir);
+        m_logger->Log("Plugin Manager", __LINE__, "Found plugin directory at: " + m_pluginDir, LogLevel::MESSAGE);
     }
 
     lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os, sol::lib::string, sol::lib::io);
@@ -15,7 +15,7 @@ PluginManager::PluginManager(){
     for(auto&& entry : std::filesystem::directory_iterator(m_pluginDir)){
         if(entry.path().extension() == ".lua"){
             m_plugins.emplace_back(entry.path());
-            m_logger.Log(__FILE_NAME__, 0, "Found plugin: " + entry.path().filename().string());
+            m_logger->Log(__FILE_NAME__, 0, "Found plugin: " + entry.path().filename().string(), LogLevel::INFO);
         }
     }
 
