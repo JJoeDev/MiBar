@@ -18,7 +18,7 @@ MiBar::MiBar(const std::string& file){
 
     m_conn = xcb_connect(nullptr, nullptr);
     if(xcb_connection_has_error(m_conn)){
-        m_logger->Log(__FILE__, __LINE__, "Could not connect to X server!", LogLevel::ERROR);
+        m_logger->Log(FileName(__FILE__), __LINE__, "Could not connect to X server!", LogLevel::ERROR);
         return;
     }
 
@@ -32,7 +32,7 @@ MiBar::MiBar(const std::string& file){
     auto mon = r.GetDisplayInfo(m_cfg.GetConfig(TARGET_MON));
 
     if(!mon){
-        m_logger->Log(__FILE__, __LINE__, "Could not find monitor from config.bar. Attempting to find primary monitor", LogLevel::ERROR);
+        m_logger->Log(FileName(__FILE__), __LINE__, "Could not find monitor from config.bar. Attempting to find primary monitor", LogLevel::ERROR);
         mon = r.GetPrimaryDisplay(m_conn, m_window);
     }
 
