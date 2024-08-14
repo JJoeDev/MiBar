@@ -168,12 +168,13 @@ For a visual example of this script take a look at the third [image](#images)
 
 This is a simple list of what I am working on for future releases
 
-| List of stuff I want to work on |
-| - |
-| DPI Scaling |
-| Initial boot auto creates config.bar |
-| Initial boot auto grabs primary monitor for config.bar |
-| Renderer switching to cairo or something similar |
+- [ ] Re-run plugins when they need to update the look of the bar
+- [ ] DPI Scaling
+- [ ] Create a config.bar if none is found
+- [x] If no monitor is defined, find one
+- [ ] (Future) Find primary monitor instead of monitor at (0, 0)
+- [ ] Switch rendering engine to something like cairo
+- [ ] Give plugins more control
 
 ## License
 
