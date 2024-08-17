@@ -20,24 +20,41 @@ public:
     ~Randr();
 
     /**
-        A function that returns crtc info for the display name 
+        Get a pointer to xcb_randr_get_crtc_info_reply_t for a given display
 
-        @param display This is the name of the display to get the information about
-
-        @return Returns a pointer to the crtc info reply containing info such as scale and position
+        @param display name of the display to get a crtc pointer to
+        @return xcb_randr_get_crtc_info_reply_t*
     */
-    //const xcb_randr_get_crtc_info_reply_t* GetDisplayInfo(const std::string& display) const;
-    //const xcb_randr_get_crtc_info_reply_t* GetPrimaryDisplay(xcb_connection_t* c, xcb_window_t w) const;
-
     const xcb_randr_get_crtc_info_reply_t* GetCrtcInfo(const std::string& display) const;
+
+    /**
+        Get a pointer to the display at x = 0, y = 0 (primary implementation in the works)
+
+        @param c a pointer to the xcb_connection_t
+        @param w a xcb_window_t
+        @return xcb_randr_get_crtc_info_reply_t*
+    */
     const xcb_randr_get_crtc_info_reply_t* GetPrimaryDisplay(xcb_connection_t* c, xcb_window_t w) const;
+
+    /**
+        Get a calculated DPI value for a given display
+
+        @param display name of the display to get the DPI from
+        @return const int : DPI value
+    */
     const int GetDisplayDPI(const std::string& display);
+
+    /**
+        Get all stored data for a given display
+
+        @param display name of the display to get data from
+        @return std::unique_ptr to a dpyInfo struct
+    */
     const std::unique_ptr<dpyInfo> GetDisplayInfo(const std::string& display);
 
 private:
     std::shared_ptr<Logger> m_logger;
 
-    //std::unordered_map<std::string, xcb_randr_get_crtc_info_reply_t*> m_displays;
     std::unordered_map<std::string, dpyInfo> m_displays;
 };
 

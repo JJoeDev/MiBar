@@ -44,7 +44,7 @@ Randr::Randr(xcb_connection_t* c, xcb_screen_t* s){
         }
 
         // DPI = (THP / TW + TVP / TL) / 2
-        int dpyDpi = (crtcReply->width / infoReply->mm_width + crtcReply->height / infoReply->mm_height) / 2;
+        int dpyDpi = crtcReply->width / infoReply->mm_width;
         m_logger->Log(FileName(__FILE__), __LINE__, "DPI calculated to: " + std::to_string(dpyDpi), LogLevel::DEBUG);
 
         std::string displayName(reinterpret_cast<char*>(xcb_randr_get_output_info_name(infoReply)), xcb_randr_get_output_info_name_length(infoReply));

@@ -37,12 +37,10 @@ MiBar::MiBar(const std::string& file){
         mon = randr.GetPrimaryDisplay(m_conn, m_window);
     }
 
-    int dpi = randr.GetDisplayDPI(m_cfg.GetConfig(TARGET_MON));
-
-    m_x = mon->x + m_configX;
-    m_y = mon->y + m_configY;
-    m_w = m_configW;
-    m_h = m_configH;
+    m_x = mon->x + (m_configX / 100.f) * mon->x;
+    m_y = mon->y + (m_configY / 100.f) * mon->y;
+    m_w = (m_configW / 100.f) * mon->width;
+    m_h = (m_configH / 100.f) * mon->height;
 
     m_window = xcb_generate_id(m_conn);
     xcb_create_window(m_conn,
