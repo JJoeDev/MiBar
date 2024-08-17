@@ -22,14 +22,11 @@ TargetMonitor: HDMI-0
 Font: lucidasans-10
 FontFallback: fixed
 
-* The transform values are additive to the information recieved from TargetMonitor
-* This means if the monitor is 1920 wide and BarWidth is 0 then the bar is also 1920 wide
-* To make the bar slimmer BarWidth needs to be a negative number
-* BarHeight is not aditive and is 0 high by default
-* BarX and BarY is the monitor coordinates for where to draw the bar at
+* The transformation are in percentage
+* You can make a small centered bar by making BarWidth 50% and BarX 25%
 
-BarWidth: 0
-BarHeight: 32
+BarWidth: 100
+BarHeight: 3
 BarX: 0
 BarY: 0
 
