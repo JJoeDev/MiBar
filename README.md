@@ -113,14 +113,11 @@ TargetMonitor: HDMI-0
 Font: lucidasans-10
 FontFallback: fixed
 
-* The transform values are additive to the information recieved from TargetMonitor
-* This means if the monitor is 1920 wide and BarWidth is 0 then the bar is also 1920 wide
-* To make the bar slimmer BarWidth needs to be a negative number
-* BarHeight is not aditive and is 0 high by default
-* BarX and BarY is the monitor coordinates for where to draw the bar at
+* The transformation are in percentage
+* You can make a small centered bar by making BarWidth 50% and BarX 25%
 
-BarWidth: 0
-BarHeight: 32
+BarWidth: 100
+BarHeight: 3
 BarX: 0
 BarY: 0
 
@@ -169,7 +166,7 @@ For a visual example of this script take a look at the third [image](#images)
 This is a simple list of what I am working on for future releases
 
 - [ ] Re-run plugins when they need to update the look of the bar
-- [ ] DPI Scaling
+- [x] DPI Scaling
 - [ ] Create a config.bar if none is found
 - [x] If no monitor is defined, find one
 - [ ] (Future) Find primary monitor instead of monitor at (0, 0)
