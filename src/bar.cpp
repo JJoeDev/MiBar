@@ -18,7 +18,7 @@ MiBar::MiBar(const std::string& file){
 
     m_conn = xcb_connect(nullptr, nullptr);
     if(xcb_connection_has_error(m_conn)){
-        m_logger.Log(__FILE_NAME__, __LINE__, "Could not connect to X server!", LogLvl::ERROR);
+        m_logger->Log(FileName(__FILE__), __LINE__, "Could not connect to X server!", LogLevel::ERROR);
         return;
     }
 
@@ -28,18 +28,19 @@ MiBar::MiBar(const std::string& file){
     m_winValues[0] = m_screen->black_pixel;
     m_winValues[1] = XCB_EVENT_MASK_EXPOSURE;
 
-    Randr r(m_conn, m_screen);
-    auto mon = r.GetDisplayInfo(m_cfg.GetConfig(TARGET_MON));
+    Randr randr(m_conn, m_screen);
+    //auto mon = r.GetDisplayInfo(m_cfg.GetConfig(TARGET_MON));
+    auto mon = randr.GetCrtcInfo(m_cfg.GetConfig(TARGET_MON));
 
     if(!mon){
-        m_logger.Log(__FILE_NAME__, __LINE__, "Could not find monitor from config.bar. Attempting to find primary monitor", LogLvl::ERROR);
-        mon = r.GetPrimaryDisplay(m_conn, m_window);
+        m_logger->Log(FileName(__FILE__), __LINE__, "Could not find monitor from config.bar. Attempting to find primary monitor", LogLevel::ERROR);
+        mon = randr.GetPrimaryDisplay(m_conn, m_window);
     }
 
-    m_x = mon->x + m_configX;
-    m_y = mon->y + m_configY;
-    m_w = mon->width + m_configW;
-    m_h = m_configH;
+    m_x = mon->x + (m_configX / 100.f) * mon->x;
+    m_y = mon->y + (m_configY / 100.f) * mon->y;
+    m_w = (m_configW / 100.f) * mon->width;
+    m_h = (m_configH / 100.f) * mon->height;
 
     m_window = xcb_generate_id(m_conn);
     xcb_create_window(m_conn,

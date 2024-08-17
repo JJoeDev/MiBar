@@ -88,7 +88,7 @@ public:
 private:
     xcb_connection_t* m_conn = nullptr;
     xcb_window_t& m_window;
-    Logger m_logger;
+    std::shared_ptr<Logger> m_logger;
 
     xcb_get_geometry_reply_t* m_geometry = nullptr;
 

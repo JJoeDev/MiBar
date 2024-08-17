@@ -1,6 +1,7 @@
 #ifndef MIBAR_UTILS_H
 #define MIBAR_UTILS_H
 
+#include <string>
 #include <cstdlib>
 #include <cstring>
 
@@ -36,6 +37,13 @@ inline xcb_atom_t GetAtom(xcb_connection_t* conn, const char* atomName){
 inline bool TestCookie(xcb_void_cookie_t cookie, xcb_connection_t* conn){
     xcb_generic_error_t* err = xcb_request_check(conn, cookie);
     return err ? true : false;
+}
+
+inline const std::string FileName(const std::string& f){
+    std::string file(f);
+    std::size_t last = file.find_last_of('/') + 1;
+    file.erase(0, last);
+    return file;
 }
 
 #endif

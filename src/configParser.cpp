@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <fstream>
 
+#include "utils.h"
 #include "configParser.h"
 
 ConfigParser::ConfigParser(){
@@ -22,7 +23,7 @@ void ConfigParser::Parse(const std::string& file){
 
     std::ifstream infile(configDir);
     if(!infile){
-        std::cerr << "Error opening config file! : " << configDir << '\n';
+        m_logger->Log(FileName(__FILE__), __LINE__, "Could not open config file: " + configDir.string(), LogLevel::ERROR);
         return;
     }
 
@@ -37,6 +38,7 @@ void ConfigParser::Parse(const std::string& file){
 
         if(!std::getline(lineStream, key, ':')){
             std::cerr << "Invalid config! : " << line << '\n';
+            m_logger->Log(FileName(__FILE__), __LINE__, "Invalid configuration! : " + line, LogLevel::ERROR);
             continue;
         }
 
@@ -45,7 +47,7 @@ void ConfigParser::Parse(const std::string& file){
             m_configs[key] = value;
         }
         else{
-            std::cerr << "Missing value for key: " << key << '\n';
+            m_logger->Log(FileName(__FILE__), __LINE__, "Missing value for key: " + key, LogLevel::WARNING);
         }
     }
 }

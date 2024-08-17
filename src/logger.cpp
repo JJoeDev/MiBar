@@ -1,39 +1,32 @@
 #include "logger.h"
 
-std::shared_ptr<Logger> g_Logger;
+std::shared_ptr<Logger> Logger::m_logInstance;
 
-void Logger::Log(const std::string& file, const int line, const std::string& msg, LogLvl level){
-    std::string type;
-    
-    // Terminal color documentation >>> https://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
-
-    switch(level){
-    case LogLvl::NONE:
-        type = "";
-        break;
-    case LogLvl::ERROR:
-        type = "\033[31m[ERROR] \033[0m";
-        break;
-    case LogLvl::WARNING:
-        type = "\033[33m[WARNING] \033[0m";
-        break;
-    case LogLvl::INFO:
-        type = "\033[1m\033[32m[INFO] \033[0m";
-        break;
-    case LogLvl::DBUG:
-        type = "\033[7m\033[33m[DEBUG] \033[0m";
-        break;
+std::shared_ptr<Logger> Logger::GetInstance(){
+    if(m_logInstance == nullptr){
+        m_logInstance = std::shared_ptr<Logger>(new Logger());
     }
 
-#ifndef NDEBUG 
-    ConsoleLog(std::string{type + msg + " : " + file + (line > 0 ? " : " + std::to_string(line) : "")});
-#else
-    if(level != LogLvl::DBUG) ConsoleLog(std::string{type + msg + " : " + file + (line > 0 ? " : " + std::to_string(line) : "")});
-#endif
+    return m_logInstance;
 }
 
-// PRIVATES
+// Terminal color documentation >>> https://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
+void Logger::Log(const std::string& file, int line, const std::string& msg, const LogLevel& level){
+#ifdef NDEBUG
+    if(level == LogLevel::DEBUG) return;
+#endif
 
-void Logger::ConsoleLog(const std::string& msg){
-    std::cout << msg << '\n';
+    std::string logPrefix("");
+
+    switch(level){
+    case LogLevel::MESSAGE: logPrefix = "\033[1;36m[ MESSAGE ]\033[0m "; break;
+    case LogLevel::ERROR:   logPrefix = "\033[1;31m[  ERROR  ]\033[0m "; break;
+    case LogLevel::WARNING: logPrefix = "\033[1;33m[ WARNING ]\033[0m "; break;
+    case LogLevel::INFO:    logPrefix = "\033[1;32m[  INFO   ]\033[0m "; break;
+    case LogLevel::DEBUG:   logPrefix = "\033[7;33m[  DEBUG  ]\033[0m "; break;
+    default: break;
+    }
+
+    std::string message(logPrefix + msg + " -> " + file + " : " + std::to_string(line));
+    std::cout << message << '\n';
 }

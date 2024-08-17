@@ -35,6 +35,8 @@ public:
     const std::string GetConfig(const int key) const;
 
 private:
+    std::shared_ptr<Logger> m_logger;
+
     std::unordered_map<std::string, std::string> m_configs;
 
     const char* m_configTable[CFG_TYPE::CFG_COUNT]{
