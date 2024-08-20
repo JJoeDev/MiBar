@@ -62,7 +62,7 @@ MiBar::MiBar(const std::string& file){
 }
 
 MiBar::~MiBar(){
-    
+    xcb_disconnect(m_conn);
 }
 
 void MiBar::EventLoop() {
@@ -116,30 +116,33 @@ void MiBar::EventLoop() {
 // PRIVATES
 
 void MiBar::SetProps(){ // https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
-    xcb_atom_t wmTypeAtom = GetAtom(m_conn, "_NET_WM_WINDOW_TYPE");
+    xcb_atom_t wmAtomDescriber = GetAtom(m_conn, "_NET_WM_WINDOW_TYPE");
     xcb_atom_t wmTypeDockAtom = GetAtom(m_conn, "_NET_WM_WINDOW_TYPE_DOCK");
-    xcb_change_property(m_conn, XCB_PROP_MODE_PREPEND, m_window, wmTypeAtom, XCB_ATOM_ATOM, 32, 1, &wmTypeDockAtom);
+    xcb_change_property(m_conn, XCB_PROP_MODE_PREPEND, m_window, wmAtomDescriber, XCB_ATOM_ATOM, 32, 1, &wmTypeDockAtom);
 
-    xcb_atom_t wmStateAtom = GetAtom(m_conn, "_NET_WM_STATE");
+    wmAtomDescriber = GetAtom(m_conn, "_NET_WM_STATE");
     xcb_atom_t wmStateAtoms[] = {GetAtom(m_conn, "_NET_WM_STATE_STICKY"), GetAtom(m_conn, "_NET_WM_STATE_ABOVE")};
-    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStateAtom, XCB_ATOM_ATOM, 32, 2, wmStateAtoms);
+    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmAtomDescriber, XCB_ATOM_ATOM, 32, 2, wmStateAtoms);
 
-    xcb_atom_t wmStrutAtom = GetAtom(m_conn, "_NET_WM_STRUT");
+    wmAtomDescriber = GetAtom(m_conn, "_NET_WM_STRUT");
     uint32_t strut[4]{
         0,0,
         static_cast<uint32_t>(m_h + m_configY),
         0
     };
-    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStrutAtom, XCB_ATOM_CARDINAL, 32, 4, strut);
+    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmAtomDescriber, XCB_ATOM_CARDINAL, 32, 4, strut);
 
     // EWMH (Extended Window Manager Hint) Reserve space for bar
-    xcb_atom_t wmStrutPartialAtom = GetAtom(m_conn, "_NET_WM_STRUT_PARTIAL");
+    wmAtomDescriber = GetAtom(m_conn, "_NET_WM_STRUT_PARTIAL");
     const uint32_t strutPartial[12]{
         0,0,
         static_cast<uint32_t>(m_h + m_configY),
-        0,0,0,0,0,0,0,0,0
+        0,0,0,0,0,
+        static_cast<uint32_t>(m_x),
+        static_cast<uint32_t>(m_x + m_w),
+        0,0
     };
-    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmStrutPartialAtom, XCB_ATOM_CARDINAL, 32, 12, strutPartial);
+    xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, wmAtomDescriber, XCB_ATOM_CARDINAL, 32, 12, strutPartial);
 
     // Set window title
     std::string windowTitle = "MiBar_" + m_cfg.GetConfig(TARGET_MON);

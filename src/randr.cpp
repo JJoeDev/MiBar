@@ -38,7 +38,6 @@ Randr::Randr(xcb_connection_t* c, xcb_screen_t* s){
 
         if(!crtcReply){
             m_logger->Log(FileName(__FILE__), __LINE__, "Could not get crtc reply from XCB!", LogLevel::ERROR);
-            free(crtcReply);
             free(infoReply);
             continue;
         }
