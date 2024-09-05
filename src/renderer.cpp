@@ -20,7 +20,7 @@ Renderer::Renderer(const xcb_screen_t* s, xcb_connection_t* c, xcb_window_t& w, 
 
     xcb_void_cookie_t fontCookie = xcb_open_font_checked(c, m_font, font.size(), font.c_str());
     if(TestCookie(fontCookie, c)){
-        m_logger->Log(FileName(__FILE__), __LINE__, "Could not open user-defined font. Trying Fallback font!", LogLevel::WARNING);
+        m_logger->Log(MI_FILENAME, __LINE__, "Could not open user-defined font. Trying Fallback font!", LogLevel::WARNING);
         xcb_open_font_checked(c, m_font, fallbackFont.size(), fallbackFont.c_str());
     }
 
@@ -128,7 +128,7 @@ std::optional<std::pair<int, int>> Renderer::GetStringSize(const std::string& st
     reply = xcb_query_text_extents_reply(m_conn, cookie, nullptr);
 
     if(reply == nullptr){
-        m_logger->Log(FileName(__FILE__), __LINE__, "Could not find a font! Please take a look at the config.bar", LogLevel::ERROR);
+        m_logger->Log(MI_FILENAME, __LINE__, "Could not find a font! Please take a look at the config.bar", LogLevel::ERROR);
         return std::nullopt;
     }
 

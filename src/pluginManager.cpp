@@ -14,16 +14,12 @@ PluginManager::PluginManager(){
 
     for(auto&& entry : std::filesystem::directory_iterator(m_pluginDir)){
         if(entry.path().extension() == ".lua"){
-            m_plugins.emplace_back(entry.path());
+            m_plugins.emplace_back('n', entry.path());
             m_logger->Log(FileName(__FILE__), 0, "Found plugin: " + entry.path().filename().string(), LogLevel::INFO);
         }
     }
 
-    lua["Alignment"] = lua.create_table_with(
-        "LEFT", ALIGNMENT::LEFT,
-        "CENTER", ALIGNMENT::CENTER,
-        "RIGHT", ALIGNMENT::RIGHT
-    );
+    GenericExposes();
 }
 
 PluginManager::~PluginManager(){
@@ -44,6 +40,22 @@ void PluginManager::ExposeFuncToLua(const std::string& funcName, std::function<v
 
 void PluginManager::RunScripts(){
     for(auto&& i : m_plugins){
-        lua.script_file(i);
+        lua.script_file(i.second);
+        if(i.first == 'n' && lua["regularUpdatesBool"] == true)
+            i.first = '1';
+        else
+            i.first = '0';
     }
+}
+
+// PRIVATES
+
+void PluginManager::GenericExposes(){
+    lua["Alignment"] = lua.create_table_with(
+        "LEFT", ALIGNMENT::LEFT,
+        "CENTER", ALIGNMENT::CENTER,
+        "RIGHT", ALIGNMENT::RIGHT
+    );
+
+    lua.set("regularUpdatesBool", false);
 }

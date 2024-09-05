@@ -2,7 +2,6 @@
 #include <filesystem>
 #include <fstream>
 
-#include "utils.h"
 #include "configParser.h"
 
 ConfigParser::ConfigParser(){
@@ -23,7 +22,7 @@ void ConfigParser::Parse(const std::string& file){
 
     std::ifstream infile(configDir);
     if(!infile){
-        m_logger->Log(FileName(__FILE__), __LINE__, "Could not open config file: " + configDir.string(), LogLevel::ERROR);
+        m_logger->Log(MI_FILENAME, __LINE__, "Could not open config file: " + configDir.string(), LogLevel::ERROR);
         return;
     }
 
@@ -38,7 +37,7 @@ void ConfigParser::Parse(const std::string& file){
 
         if(!std::getline(lineStream, key, ':')){
             std::cerr << "Invalid config! : " << line << '\n';
-            m_logger->Log(FileName(__FILE__), __LINE__, "Invalid configuration! : " + line, LogLevel::ERROR);
+            m_logger->Log(MI_FILENAME, __LINE__, "Invalid configuration! : " + line, LogLevel::ERROR);
             continue;
         }
 
@@ -47,14 +46,16 @@ void ConfigParser::Parse(const std::string& file){
             m_configs[key] = value;
         }
         else{
-            m_logger->Log(FileName(__FILE__), __LINE__, "Missing value for key: " + key, LogLevel::WARNING);
+            m_logger->Log(MI_FILENAME, __LINE__, "Missing value for key: " + key, LogLevel::WARNING);
         }
     }
 }
 
 const std::string ConfigParser::GetConfig(const int key) const {
-    if(auto it = m_configs.find(m_configTable[key]); it != m_configs.end())
+    if(auto it = m_configs.find(m_configTable[key]); it != m_configs.end()){
+        m_logger->Log(MI_FILENAME, __LINE__, "SECOND VALUE: " + it->second, LogLevel::DEBUG);
         return it->second;
+    }
 
     return "0x0";
 }

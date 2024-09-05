@@ -18,22 +18,24 @@ public:
 
 private:
     void SetProps();
+    bool CheckConfigValid(const std::string& value);
 
     ConfigParser m_cfg;
 
     // Basic connections
-    xcb_connection_t* m_conn = nullptr;
-    xcb_screen_t* m_screen = nullptr;
-    xcb_window_t m_window = 0;
+    xcb_connection_t* m_conn{nullptr};
+    xcb_screen_t* m_screen{nullptr};
+    xcb_window_t m_window{0};
 
-    int m_configX = 0;
-    int m_configY = 0;
-    int m_configW = 0;
-    int m_configH = 0;
+    int m_configX{0};
+    int m_configY{0};
+    float m_configW{100};
+    float m_configH{2.7};
 
-    int m_x, m_y, m_w, m_h;
+    int m_x, m_y;
+    float m_w, m_h;
 
-    uint32_t m_winMask = 0;
+    uint32_t m_winMask{0};
     uint32_t m_winValues[2];
 
     std::shared_ptr<Logger> m_logger;
