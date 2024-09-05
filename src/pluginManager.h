@@ -26,9 +26,11 @@ private:
 
     std::string m_pluginDir = "";
 
+    void GenericExposes();
+
     sol::state lua;
 
-    std::vector<std::string> m_plugins;
+    std::vector<std::pair<char, std::string>> m_plugins;
 };
 
 #endif

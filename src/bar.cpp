@@ -4,21 +4,22 @@
 #include "randr.h"
 #include "pluginManager.h"
 
-#if AUTOMATIC_UPDATES_ENABLE
-#include <thread>
-#endif
-
 MiBar::MiBar(const std::string& file){
     m_cfg.Parse(file);
 
-    m_configX = std::stoi(m_cfg.GetConfig(BAR_X)); 
-    m_configY = std::stoi(m_cfg.GetConfig(BAR_Y));
-    m_configW = std::stoi(m_cfg.GetConfig(BAR_W));
-    m_configH = std::stoi(m_cfg.GetConfig(BAR_H));
+    // m_configX = std::stoi(m_cfg.GetConfig(BAR_X)); 
+    // m_configY = std::stoi(m_cfg.GetConfig(BAR_Y));
+    // m_configW = std::stoi(m_cfg.GetConfig(BAR_W));
+    // m_configH = std::stoi(m_cfg.GetConfig(BAR_H));
+
+    m_configX = CheckConfigValid(m_cfg.GetConfig(BAR_X)) ? std::stoi(m_cfg.GetConfig(BAR_X)) : m_configX;
+    m_configY = CheckConfigValid(m_cfg.GetConfig(BAR_Y)) ? std::stoi(m_cfg.GetConfig(BAR_Y)) : m_configY;
+    m_configW = CheckConfigValid(m_cfg.GetConfig(BAR_W)) ? std::stof(m_cfg.GetConfig(BAR_W)) : m_configW;
+    m_configH = CheckConfigValid(m_cfg.GetConfig(BAR_H)) ? std::stof(m_cfg.GetConfig(BAR_H)) : m_configH;
 
     m_conn = xcb_connect(nullptr, nullptr);
     if(xcb_connection_has_error(m_conn)){
-        m_logger->Log(FileName(__FILE__), __LINE__, "Could not connect to X server!", LogLevel::ERROR);
+        m_logger->Log(MI_FILENAME, __LINE__, "Could not connect to X server!", LogLevel::ERROR);
         return;
     }
 
@@ -29,11 +30,10 @@ MiBar::MiBar(const std::string& file){
     m_winValues[1] = XCB_EVENT_MASK_EXPOSURE;
 
     Randr randr(m_conn, m_screen);
-    //auto mon = r.GetDisplayInfo(m_cfg.GetConfig(TARGET_MON));
     auto mon = randr.GetCrtcInfo(m_cfg.GetConfig(TARGET_MON));
 
     if(!mon){
-        m_logger->Log(FileName(__FILE__), __LINE__, "Could not find monitor from config.bar. Attempting to find primary monitor", LogLevel::ERROR);
+        m_logger->Log(MI_FILENAME, __LINE__, "Could not find monitor from config.bar. Attempting to find primary monitor", LogLevel::ERROR);
         mon = randr.GetPrimaryDisplay(m_conn, m_window);
     }
 
@@ -72,44 +72,17 @@ void MiBar::EventLoop() {
     pmgr.ExposeFuncToLua("DrawString", [&r](const std::string& str, ALIGNMENT align, const int x){r.DrawStr(str, align, x);});
     pmgr.ExposeFuncToLua("DrawRect", [&r](int x, int y, int w, int h, int idx){r.DrawRect(x, y, w, h, idx);});
 
-#if AUTOMATIC_UPDATES_ENABLE
-    using namespace std::chrono;
-
-    auto last_update = steady_clock::now();
-    const auto update_interval = seconds(UPDATE_TIME);
-#endif
-
     xcb_generic_event_t* e;
-    while (true) {
-        if ((e = xcb_poll_for_event(m_conn))) {
-            if (e) {
-                switch (e->response_type & 0x7F) {
-                case XCB_EXPOSE:
-                    r.Clear(0, 0, m_w, m_h);
-                    pmgr.RunScripts();
-                    xcb_flush(m_conn);
-                    break;
-                default:
-                    // Handle other events if needed
-                    break;
-                }
-                free(e);
-            }
+    while((e = xcb_wait_for_event(m_conn))){
+        switch(e->response_type & 0x7F){
+        case XCB_EXPOSE:
+            r.Clear(0, 0, m_w, m_h);
+            pmgr.RunScripts();
+            xcb_flush(m_conn);
+            break;
+        default:
+            break;
         }
-#if AUTOMATIC_UPDATES_ENABLE
-        else {
-            auto now = steady_clock::now();
-            if (now - last_update >= update_interval) {
-                // Force update
-                r.Clear(0, 0, m_w, m_h);
-                pmgr.RunScripts();
-                xcb_flush(m_conn);
-                last_update = now;
-            }
-            // Yield CPU time to other threads
-            std::this_thread::yield();
-        }
-#endif
     }
 }
 
@@ -149,4 +122,8 @@ void MiBar::SetProps(){ // https://specifications.freedesktop.org/wm-spec/1.3/ar
     xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, sizeof(char*), windowTitle.size(), windowTitle.c_str());
 
     xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_window, XCB_ATOM_WM_CLASS, XCB_ATOM_STRING, sizeof(char*), 5, "MiBar");
+}
+
+bool MiBar::CheckConfigValid(const std::string& value){
+    return value == "0x0" ? false : true;
 }

@@ -5,6 +5,10 @@
 #include <memory>
 #include <string>
 
+#include "utils.h"
+
+#define MI_FILENAME FileName(__FILE__)
+
 enum class LogLevel{
     MESSAGE = 0,
     ERROR,

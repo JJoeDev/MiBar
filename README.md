@@ -45,6 +45,8 @@ MiBar has migrated from a C header file for configuration, to a .bar configurati
 * cmake
 * make
 * All xcb libraries
+* lua5.4
+* lua5.4-dev
 * sol2
 
 ### Installing
