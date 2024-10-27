@@ -1,7 +1,7 @@
 [
 {
   "directory": "/home/jjoe/dev/cpp/MiBar",
-  "command": "clang++ -Wall -Wpedantic -Wextra -Wconversion -std=gnu++17 -o CMakeFiles/MiBar.dir/src/main.cpp.o -c /home/jjoe/dev/cpp/MiBar/src/main.cpp",
+  "command": "clang++   -Wall -Wpedantic -Wextra -Wconversion -std=gnu++17 -o CMakeFiles/MiBar.dir/src/main.cpp.o -c /home/jjoe/dev/cpp/MiBar/src/main.cpp",
   "file": "/home/jjoe/dev/cpp/MiBar/src/main.cpp",
   "output": "CMakeFiles/MiBar.dir/src/main.cpp.o"
 }
