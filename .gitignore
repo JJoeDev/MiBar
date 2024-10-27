@@ -5,3 +5,5 @@ Makefile
 CMakeCache.*
 TODO
 .clangd
+.ninja_*
+build.ninja
