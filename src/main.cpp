@@ -3,7 +3,10 @@
 #include "Application.h"
 
 int main(){
-    bar::Application app;
+    bar::AppParams params;
+    params.AppName = "MiBar";
+    
+    bar::Application app(params);
 
     std::cin.get();
     
