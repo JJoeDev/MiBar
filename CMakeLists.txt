@@ -14,3 +14,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 file(GLOB_RECURSE SRC src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SRC})
+target_link_libraries(${PROJECT_NAME}
+  xcb
+  xcb-util
+  xcb-icccm
+  xcb-randr
+)
+
+target_include_directories(${PROJECT_NAME}
+  PRIVATE "${CMAKE_SOURCE_DIR}/src"
+)

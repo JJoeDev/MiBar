@@ -1,6 +1,11 @@
 #include <iostream>
 
+#include "Application.h"
+
 int main(){
-    std::cout << "Hello, MiBar - V2\n";
+    bar::Application app;
+
+    std::cin.get();
+    
     return 0;
 }
