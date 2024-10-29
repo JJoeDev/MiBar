@@ -18,6 +18,8 @@ namespace bar{
         Application(const AppParams& params);
         ~Application();
 
+        void Temp();
+
     private:
         std::shared_ptr<xcb_connection_t> m_conn{nullptr};
         std::unique_ptr<xcb_screen_t> m_screen{nullptr};
