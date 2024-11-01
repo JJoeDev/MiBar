@@ -7,7 +7,7 @@ int main(){
     params.AppName = "MiBar";
     
     bar::Application app(params);
-    app.Temp();
+    app.EventLoop();
 
     std::cin.get();
     

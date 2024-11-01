@@ -18,7 +18,9 @@ namespace bar{
         Application(const AppParams& params);
         ~Application();
 
-        void Temp();
+        void EventLoop();
+
+        void ClearBG();
 
     private:
         std::shared_ptr<xcb_connection_t> m_conn{nullptr};
