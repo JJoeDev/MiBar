@@ -1,6 +1,3 @@
-#include <cairo/cairo-xcb.h>
-#include <cairo/cairo.h>
-
 #include <xcb/xcb.h>
 #include <xcb/xcb_icccm.h>
 #include <xcb/xproto.h>
@@ -70,45 +67,6 @@ namespace bar{
     }
 
     void Application::ClearBG(){
-        xcb_visualtype_t* visual_type = nullptr;
-        xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator(xcb_get_setup(m_conn.get()));
-
-        for(; screen_iter.rem; xcb_screen_next(&screen_iter)){
-            xcb_depth_iterator_t depth_iter = xcb_screen_allowed_depths_iterator(screen_iter.data);
-            for(; depth_iter.rem; xcb_depth_next(&depth_iter)){
-                xcb_visualtype_iterator_t visual_iter = xcb_depth_visuals_iterator(depth_iter.data);
-                for(; visual_iter.rem; xcb_visualtype_next(&visual_iter)){
-                    if(m_screen->root_visual == visual_iter.data->visual_id){
-                        visual_type = visual_iter.data;
-                        goto visual_found;
-                    }
-                }
-            }
-        }
-
-visual_found: ;
-
-        cairo_surface_t* surface = cairo_xcb_surface_create(m_conn.get(), m_window, visual_type, 150, 150);
-        cairo_t* cr = cairo_create(surface);
-
-        cairo_set_source_rgb(cr, 0, 1, 0);
-        cairo_paint(cr);
-
-        cairo_set_source_rgb(cr, 1, 0, 0);
-        cairo_move_to(cr, 0, 0);
-        cairo_line_to(cr, 150, 0);
-        cairo_line_to(cr, 150, 150);
-        cairo_close_path(cr);
-        cairo_fill(cr);
-
-        cairo_set_source_rgb(cr, 0, 0, 1);
-        cairo_set_line_width(cr, 20);
-        cairo_move_to(cr, 0, 150);
-        cairo_line_to(cr, 150, 0);
-        cairo_stroke(cr);
-
-        cairo_surface_flush(surface);
-
         miUtil::Logger::INFO("Clear function has run");
     }
 }
