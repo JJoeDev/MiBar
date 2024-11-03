@@ -7,6 +7,7 @@
 #include <xcb/xcb_aux.h>
 #include <xcb/xcb_image.h>
 
+#include "icccm.h"
 #include "Application.h"
 #include "Logger.h"
 
@@ -41,8 +42,7 @@ namespace bar{
                         m_screen->root_visual,           // Visual
                         XCB_CW_OVERRIDE_REDIRECT | XCB_CW_EVENT_MASK, mask);                   // Masks, not in use yet
 
-        xcb_icccm_set_wm_name(m_conn.get(), m_window, XCB_ATOM_STRING, 8, static_cast<uint32_t>(params.AppName.length()), params.AppName.c_str());
-        xcb_icccm_set_wm_class(m_conn.get(), m_window, static_cast<uint32_t>(params.AppName.length()), params.AppName.c_str());
+        icccmUtil::SetWMName(m_conn.get(), m_window, params.AppName, params.AppName);
 
         xcb_map_window(m_conn.get(), m_window); // Map window on screen
         xcb_flush(m_conn.get()); // Flush all commands to xcb

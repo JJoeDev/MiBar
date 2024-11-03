@@ -31,5 +31,6 @@ target_link_libraries(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
   PRIVATE "${CMAKE_SOURCE_DIR}/src/core/"
   PRIVATE "${CMAKE_SOURCE_DIR}/src/utils/"
+  PRIVATE "${CMAKE_SOURCE_DIR}/src/x11/"
   PRIVATE "${CAIRO_INCLUDE_DIRS}"
 )

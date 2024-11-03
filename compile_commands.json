@@ -1,14 +1,20 @@
 [
 {
   "directory": "/home/jjoe/dev/cpp/MiBar",
-  "command": "clang++ -I/home/jjoe/dev/cpp/MiBar/src/core -I/home/jjoe/dev/cpp/MiBar/src/utils -I/usr/include/cairo -Wall -Wpedantic -Wextra -Wconversion -std=gnu++17 -o CMakeFiles/MiBar.dir/src/core/Application.cpp.o -c /home/jjoe/dev/cpp/MiBar/src/core/Application.cpp",
+  "command": "clang++ -I/home/jjoe/dev/cpp/MiBar/src/core -I/home/jjoe/dev/cpp/MiBar/src/utils -I/home/jjoe/dev/cpp/MiBar/src/x11 -I/usr/include/cairo -Wall -Wpedantic -Wextra -Wconversion -std=gnu++17 -o CMakeFiles/MiBar.dir/src/core/Application.cpp.o -c /home/jjoe/dev/cpp/MiBar/src/core/Application.cpp",
   "file": "/home/jjoe/dev/cpp/MiBar/src/core/Application.cpp",
   "output": "CMakeFiles/MiBar.dir/src/core/Application.cpp.o"
 },
 {
   "directory": "/home/jjoe/dev/cpp/MiBar",
-  "command": "clang++ -I/home/jjoe/dev/cpp/MiBar/src/core -I/home/jjoe/dev/cpp/MiBar/src/utils -I/usr/include/cairo -Wall -Wpedantic -Wextra -Wconversion -std=gnu++17 -o CMakeFiles/MiBar.dir/src/main.cpp.o -c /home/jjoe/dev/cpp/MiBar/src/main.cpp",
+  "command": "clang++ -I/home/jjoe/dev/cpp/MiBar/src/core -I/home/jjoe/dev/cpp/MiBar/src/utils -I/home/jjoe/dev/cpp/MiBar/src/x11 -I/usr/include/cairo -Wall -Wpedantic -Wextra -Wconversion -std=gnu++17 -o CMakeFiles/MiBar.dir/src/main.cpp.o -c /home/jjoe/dev/cpp/MiBar/src/main.cpp",
   "file": "/home/jjoe/dev/cpp/MiBar/src/main.cpp",
   "output": "CMakeFiles/MiBar.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/jjoe/dev/cpp/MiBar",
+  "command": "clang++ -I/home/jjoe/dev/cpp/MiBar/src/core -I/home/jjoe/dev/cpp/MiBar/src/utils -I/home/jjoe/dev/cpp/MiBar/src/x11 -I/usr/include/cairo -Wall -Wpedantic -Wextra -Wconversion -std=gnu++17 -o CMakeFiles/MiBar.dir/src/x11/icccm.cpp.o -c /home/jjoe/dev/cpp/MiBar/src/x11/icccm.cpp",
+  "file": "/home/jjoe/dev/cpp/MiBar/src/x11/icccm.cpp",
+  "output": "CMakeFiles/MiBar.dir/src/x11/icccm.cpp.o"
 }
 ]
