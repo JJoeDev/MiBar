@@ -1,19 +1,19 @@
 # MiBar
 
+Version 2
+
 > [!WARNING]
->
-> MiBar is at a usable state, but there is still a lot to do
+> 
+> MiBar 2.0 is under heavy development and is not even close to being usable
 
 ![Header_image](./github_assets/github-header-image.png)
 (image generated with [github-profile-header-generator](https://github.com/leviarista/github-profile-header-generator?tab=readme-ov-file))
 
-MiBar is a simple Linux X11 status bar with Lua support
-
 ## Description
 
-MiBar is a simple Linux X11 status bar built with the C++ programming language. The application uses 2 external libraries, XCB to interact with the X server, and sol2 to run user made lua scripts.
+MiBar is a simple and hackable X11 Linux status bar. It is built using the C++17 programming language, communicating directly to the X server using XCB.
 
-MiBar is supposed to be customizable and easy to configure. This is the reason for using the Lua language for plugins as it makes it easy to develop for MiBar.
+MiBar is a hackable status bar as it allowes the user to write their own lua scripts, and control what is displayed on the status bar, in the form of "modules". The main config file for MiBar is supposed to be quick and easy to understand and edit.
 
 ## Contents
 
@@ -29,110 +29,58 @@ MiBar is supposed to be customizable and easy to configure. This is the reason f
 
 * [Images](#images)
 
-* [Plugin Development](#plugin-development)
-
 * [In Development](#in-development)
 
 * [License](#license)
 
 ## Getting Started
 
-MiBar has migrated from a C header file for configuration, to a .bar configuration file. This means you can now build MiBar once and change settings without having to build again.
+MiBar has a custom config file for configuring some colors and other bar related settings. This config file should be located at `~/.config/mibar/config.mibar`
 
 ### Dependencies
 
-* git
 * cmake
-* make
+* ninja
 * All xcb libraries
-* lua5.4
-* lua5.4-dev
-* sol2
 
 ### Installing
 
-Building from source is as quick as running the following commands once.
+Currently MiBar is not in any Linux package repositories, so you will have to build from source.
 
 ```
-$ git clone https://github.com/JJoeDev/MiBar.git --recursive
+$ git clone --recursive https://github.com/JJoeDev/MiBar.git
 $ cd MiBar
 $ cmake -DCMAKE_BUILD_TYPE=Release .
-$ make -j
+$ ninja
 ```
+
+Now there should be a bin directory containing the MiBar executable.
 
 ### Running MiBar
 
-MiBar can be run without any arguments, this will make it look for its own configuration file `config.bar` in `~/.config/MiBar` if this file does not exist the app cannot launch. There is an example file in the example repo
-```
-$ mv examples/config.bar ~/.config/MiBar
-$ ./bin/MiBar
-```
+In the current state of MiBar running the app is not super interesting. I would suggest running the bar in a terminal so you can easily send a stop signal to it using `ctrl+c`
 
-MiBar can also be run with some arguments
-
-```bash
-./bin/MiBar -h
-./bin/MiBar --help
-```
-
-using the -h or --help flag MiBar will just display a very short help list
-
-```bash
-./bin/MiBar -c filename
-./bin/MiBar --config filename
-```
-
-using the -c or --config flag you can specify a custom configuration file name. MiBar will still look in `~/.config/MiBar` for this file.
-
-Note that adding a file extention with this flag does not help. If the .txt extension is added MiBar will look for `filename.txt.bar`
+Want to run the app anyways? Its as simple as typing `./MiBar` in the bin directory created earlier
 
 ## Configuration
 
-MiBar uses its own configuration format that is designed to be really simple to use. For a demonstration, here is the example config file included in this repo
+In the current version of MiBar V2.0 there is no configuration yet. But once it is being implemented it will follow the easy to read format that is shown below.
 
-```bar
-* Comment. Comments can only be placed before the ':' as to not interfer with some settings
+```MiBar
+# Comment
+# MiBar will use the Key:Value style where the : is the seperator
 
-* Colors. Colors use the hexadecimal format and are prefixed with 0x
-* Hexadecimal values go from 0 to F (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F)
-* The colors are formatted as 0xRR GG BB where RR, GG, and BB reprecent red green and blue
-* MiBar has support for 5 colors, all assigned a value as below
-* Currently not all values are in use, but they will be in the future
+Background: #202020
+Foreground: #2E2E3E
 
-Background: 0x111111
-Foreground: 0x999999
-Color1: 0x777777
-Color2: 0x555555
-Color3: 0x333333
+Font: "0xProtoNerdFontRegular"
 
-* TargetMonitor is the monitor MiBar should locate and move to
-
-TargetMonitor: HDMI-0
-
-* Currently MiBar only supports fronts built in to X.
-* These fonts can be listed with a utility like 'xlsfonts' in a terminal
-
-Font: lucidasans-10
-FontFallback: fixed
-
-* The transformation are in percentage
-* You can make a small centered bar by making BarWidth 50% and BarX 25%
-
-BarWidth: 100
-BarHeight: 3
-BarX: 0
-BarY: 0
-
-* The following settings are to render a small line under every rendered component on the bar
-* UseUnderline will be false unless its value is directly "true"
-
-UseUnderlines: true
-UnderlineHeight: 3
-UnderlineOffsetX: 0
-UnderlineOffsetY: 0
+# White space will be removed at runtime by MiBar
 ```
 
 ## Images
+
+These images are from MiBar V1.0
 
 ![Image_1](./github_assets/DemoBar.png)
 
@@ -140,40 +88,19 @@ UnderlineOffsetY: 0
 
 ![Image_3](./github_assets/DemoBarWLua.png)
 
-## Plugin Development
-
-MiBar allowes for users to create their own bar by creating plugins that do what they want them to do. Lua is a simple and easy scripting language with tons of documentation online.
-
-### Creating a Plugin
-
-* **Director:** Plugins should be located in ```~/.config/MiBar/plugins```
-* **Available Functions** MiBar currently only exposes one function to the plugins, Here is an example of how to use it
-* * ```DrawString(text, alignment, x_position)```: This function draws a string to the status bar
-* * - ```text```: This is the string that will get displayed on the status bar
-* * - ```alignment```: This is an alignment option (``LEFT``, ``CENTER``, or ``RIGHT``)
-* * - ```x_position```: This is an added position on top of the alignment option
-
-**Time.lua**: Time.lua is a simple plugin that simply displays the current time on the center of the bar
-
-```lua
-local time = os.date("%a %d / %H:%M")
-
-DrawString(time, Alignment.CENTER, 0)
-```
-
-For a visual example of this script take a look at the third [image](#images)
-
 ## In Development
 
-This is a simple list of what I am working on for future releases
+Here is a list of my current priorities for what to develop on next. This list may get updated at any time.
 
-- [ ] Re-run plugins when they need to update the look of the bar
-- [x] DPI Scaling
-- [ ] Create a config.bar if none is found
-- [x] If no monitor is defined, find one
-- [ ] (Future) Find primary monitor instead of monitor at (0, 0)
-- [ ] Switch rendering engine to something like cairo
-- [ ] Give plugins more control
+- [ ] Rendering engine
+
+- [ ] Configuration parser
+
+- [ ] Lua Integration
+
+- [ ] TTF and or OTF font support
+
+- [ ] Eextended Window Manager Hints and ICCCM
 
 ## License
 
