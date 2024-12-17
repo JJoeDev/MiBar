@@ -1,5 +1,7 @@
 # MiBar
 
+<p align="center"><a href="https://codeberg.org/JJoeDev/MiBar"><img src="https://akselmo.dev/assets/images/getitoncodeberg.svg" width="200"></a></p>
+
 > [!WARNING]
 >
 > MiBar is at a usable state, but there is still a lot to do
